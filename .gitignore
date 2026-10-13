@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.wrangler/
+.sites-runtime/
+.DS_Store
+/data/
+.env
+/engineer-day-selfhost.tar.gz
+/input data/

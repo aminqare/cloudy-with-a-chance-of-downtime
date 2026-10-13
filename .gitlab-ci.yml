@@ -1,0 +1,57 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
+stages:
+  - verify
+  - deploy
+
+default:
+  tags: [shell]
+
+variables:
+  APP_IMAGE: "cloudy-with-a-chance-of-downtime:$CI_COMMIT_SHA"
+  BASE_IMAGE: "node:22-alpine"
+
+verify:
+  stage: verify
+  script:
+    - docker info >/dev/null
+    - docker image inspect "$BASE_IMAGE" >/dev/null
+    - docker build --pull=false --build-arg "BASE_IMAGE=$BASE_IMAGE" --label "org.opencontainers.image.revision=$CI_COMMIT_SHA" -t "$APP_IMAGE" .
+    - export VERIFY_CONTAINER="engineer-day-verify-$CI_JOB_ID"
+    - trap 'docker rm -f "$VERIFY_CONTAINER" >/dev/null 2>&1 || true' EXIT
+    - docker run -d --name "$VERIFY_CONTAINER" "$APP_IMAGE"
+    - |
+      for attempt in $(seq 1 30); do
+        if docker exec "$VERIFY_CONTAINER" node -e "fetch('http://127.0.0.1:3000/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"; then
+          break
+        fi
+        if [ "$attempt" -eq 30 ]; then
+          docker logs "$VERIFY_CONTAINER"
+          exit 1
+        fi
+        sleep 1
+      done
+    - docker exec "$VERIFY_CONTAINER" node -e "Promise.all([fetch('http://127.0.0.1:3000/'),fetch('http://127.0.0.1:3000/api/memories'),fetch('http://127.0.0.1:3000/landing-dance.mp4',{headers:{Range:'bytes=0-1023'}})]).then(async([page,api,video])=>{if(!page.ok||!api.ok||video.status!==206||Number(video.headers.get('content-length'))!==1024)process.exit(1)}).catch(()=>process.exit(1))"
+    - docker save "$APP_IMAGE" | gzip -1 > cloudy-with-a-chance-of-downtime-image.tar.gz
+  artifacts:
+    name: "engineer-day-image-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - cloudy-with-a-chance-of-downtime-image.tar.gz
+    expire_in: 1 day
+
+deploy_production:
+  stage: deploy
+  resource_group: huawei-a2-engineer-day-production
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_REF_PROTECTED == "true"'
+  script:
+    - gzip -dc cloudy-with-a-chance-of-downtime-image.tar.gz | docker load
+    - bash deploy/deploy.sh
+  environment:
+    name: production
+    url: http://localhost:10240

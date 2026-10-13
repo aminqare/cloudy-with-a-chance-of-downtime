@@ -1,0 +1,17 @@
+{
+  "name": "cloudy-with-a-chance-of-downtime",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.mjs",
+    "dev:selfhost": "node --watch server/index.mjs",
+    "verify:selfhost": "node scripts/verify-selfhost.mjs",
+    "verify:network-weather": "node scripts/validate-network-weather.mjs",
+    "verify:network-weather-api": "node scripts/verify-network-weather-api.mjs",
+    "verify:network-weather-a11y": "node scripts/verify-network-weather-a11y.mjs",
+    "verify:network-weather-mvp": "node scripts/verify-network-weather-mvp.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

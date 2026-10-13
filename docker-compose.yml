@@ -1,0 +1,15 @@
+services:
+  engineer-day:
+    build: .
+    container_name: huawei-a2-engineer-day
+    restart: unless-stopped
+    init: true
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${PUBLIC_PORT:-3000}:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      DATA_DIR: /app/data
