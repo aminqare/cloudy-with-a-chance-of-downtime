@@ -1,7 +1,6 @@
 {
-  "status": "fallback",
-  "fetchedAt": "2026-10-16T08:24:14.378Z",
-  "error": "IRIMO warning feed is temporarily unavailable.",
+  "status": "live",
+  "fetchedAt": "2026-10-16T08:36:16.061Z",
   "source": {
     "provider": "IRIMO",
     "url": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
@@ -24,5 +23,952 @@
       }
     }
   },
-  "warnings": []
+  "warnings": [
+    {
+      "id": "irimo-orange-هشدار-هواشناسی-سطح-نارنجی-شماره-58-سه-شنبه-مورخ-1405-07-21",
+      "provider": "IRIMO",
+      "level": "orange",
+      "levelFa": "هشدار نارنجی",
+      "severity": "severe",
+      "title": "هشدار هواشناسی-سطح نارنجی شماره 58 سه شنبه مورخ 1405/07/21",
+      "date": "1405/07/21",
+      "url": "https://www.irimo.ir/far/services/news/1182795-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D9%86%D8%A7%D8%B1%D9%86%D8%AC%DB%8C-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B4%D9%86%D8%A8%D9%87-%D9%85%D9%88%D8%B1%D8%AE-1405-07-21.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "آذربایجان شرقی، آذربایجان غربی، زنجان و کردستان، شمال و غرب فارس",
+        "provinces": [
+          {
+            "name": "East Azerbaijan",
+            "nameFa": "آذربایجان شرقی"
+          },
+          {
+            "name": "West Azerbaijan",
+            "nameFa": "آذربایجان غربی"
+          },
+          {
+            "name": "Zanjan",
+            "nameFa": "زنجان"
+          },
+          {
+            "name": "Fars",
+            "nameFa": "فارس"
+          },
+          {
+            "name": "Kurdistan",
+            "nameFa": "کردستان"
+          }
+        ],
+        "cities": [
+          {
+            "name": "Zanjan",
+            "nameFa": "زنجان",
+            "province": "Zanjan",
+            "lat": 36.6736,
+            "lon": 48.4787
+          }
+        ],
+        "locations": [
+          {
+            "name": "Zanjan",
+            "nameFa": "زنجان",
+            "province": "Zanjan",
+            "lat": 36.6736,
+            "lon": 48.4787,
+            "kind": "city"
+          },
+          {
+            "name": "East Azerbaijan",
+            "nameFa": "آذربایجان شرقی",
+            "province": "East Azerbaijan",
+            "lat": 38.0962,
+            "lon": 46.2738,
+            "kind": "province"
+          },
+          {
+            "name": "West Azerbaijan",
+            "nameFa": "آذربایجان غربی",
+            "province": "West Azerbaijan",
+            "lat": 37.5527,
+            "lon": 45.0761,
+            "kind": "province"
+          },
+          {
+            "name": "Fars",
+            "nameFa": "فارس",
+            "province": "Fars",
+            "lat": 29.5918,
+            "lon": 52.5837,
+            "kind": "province"
+          },
+          {
+            "name": "Kurdistan",
+            "nameFa": "کردستان",
+            "province": "Kurdistan",
+            "lat": 35.3219,
+            "lon": 46.9862,
+            "kind": "province"
+          }
+        ]
+      },
+      "detailFetched": true
+    },
+    {
+      "id": "irimo-yellow-هشدار-هواشناسی-دریایی-سطح-زرد-شماره-76-سازمان-مرکزی-دوشنبه-1405-07-20",
+      "provider": "IRIMO",
+      "level": "yellow",
+      "levelFa": "هشدار زرد",
+      "severity": "warning",
+      "title": "هشدار هواشناسی دریایی-سطح زرد شماره 76 سازمان مرکزی دوشنبه 1405/07/20",
+      "date": null,
+      "url": "https://www.irimo.ir/far/services/news/1182791-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%AF%D8%B1%DB%8C%D8%A7%DB%8C%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B3%D8%A7%D8%B2%D9%85%D8%A7%D9%86-%D9%85%D8%B1%DA%A9%D8%B2%DB%8C-%D8%AF%D9%88%D8%B4%D9%86%D8%A8%D9%87-.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "مناطق ساحلی و دور از ساحل استان هرمزگان، در خلیج فارس، تنگه هرمز و غرب دریای عمان",
+        "provinces": [
+          {
+            "name": "Hormozgan",
+            "nameFa": "هرمزگان"
+          }
+        ],
+        "cities": [],
+        "locations": [
+          {
+            "name": "Hormozgan",
+            "nameFa": "هرمزگان",
+            "province": "Hormozgan",
+            "lat": 27.1832,
+            "lon": 56.2666,
+            "kind": "province"
+          }
+        ]
+      },
+      "detailFetched": true
+    },
+    {
+      "id": "irimo-yellow-هشدار-هواشناسی-سطح-زرد-شماره-77-یکشنبه-مورخ-1405-07-19",
+      "provider": "IRIMO",
+      "level": "yellow",
+      "levelFa": "هشدار زرد",
+      "severity": "warning",
+      "title": "هشدار هواشناسی-سطح زرد شماره 77 یکشنبه مورخ 1405/07/19",
+      "date": "1405/07/19",
+      "url": "https://www.irimo.ir/far/services/news/1182789-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%DB%8C%DA%A9%D8%B4%D9%86%D8%A8%D9%87-%D9%85%D9%88%D8%B1%D8%AE-1405-07-19.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "دوشنبه ۱۴۰۵/۰۷/۲۰: آذربایجان غربی، کردستان، ایلام، لرستان، همدان، زنجان، جنوب سیستان و بلوچستان، شمال و شمال شرق خراسان رضوی، شمال خراسان شمالی، غرب و جنوب اصفهان، شمال و جنوب فارس، چهارمحال بختیاری، جنوب کرمان، شرق هرمزگان، سهشنبه ۱۴۰۵/۰۷/۲۱: آذربایجان شرقی، آذربایجان غربی، شمال اردبیل، کردستان، کرمانشاه، شمال ایلام، زنجان، همدان، لرستان، مرکزی، قزوین، نیمه غربی اصفهان، نیمه شمالی فارس، کهگیلویه و بویراحمد، چهارمحال بختیاری، ارتفاعات تهران، شمال البرز، جنوب سیستان و بلوچستان، شرق و شمال هرمزگان، مرکز و جنوب غرب کرمان، نوار شرقی بوشهر، چهارشنبه ۱۴۰۵/۰۷/۲۲: آذربایجان غربی، ایلام، کردستان، غرب و جنوب اصفهان، نیمه شمالی فارس، کهگیلویه و بویراحمد، چهارمحال بختیاری، مرکز غرب و جنوب غرب کرمان، ارتفاعات در استانهای تهران، البرز و سمنان، پنجشنبه ۱۴۰۵/۰۷/۲۳: آذربایجان غربی، آذربایجان شرقی، ایلام، کردستان، شمال زنجان، نیمه شمالی فارس، کهگیلویه و بویراحمد، چهارمحال بختیاری، غرب و جنوب اصفهان، جنوب غرب کرمان، جمعه ۱۴۰۵/۰۷/۲۴: آذربایجان غربی، آذربایجان شرقی، زنجان، کهگیلویه و بویراحمد، کردستان، شرق غرب و شمال هرمزگان، جنوب و جنوب غرب کرمان، شمال فارس، ارتفاعات در استانهای تهران و البرز، شنبه ۱۴۰۵/۰۷/۲۵: آذربایجان غربی، آذربایجان شرقی، کردستان، زنجان، قزوین، شمال ایلام، مرکز و جنوب اردبیل، همدان، غرب و جنوب اصفهان، شمال فارس، شرق و شمال هرمزگان، جنوب غرب کرمان، سیستان و بلوچستان، ارتفاعات در استانهای تهران، البرز، سمنان، گیلان و مازندران",
+        "provinces": [
+          {
+            "name": "East Azerbaijan",
+            "nameFa": "آذربایجان شرقی"
+          },
+          {
+            "name": "West Azerbaijan",
+            "nameFa": "آذربایجان غربی"
+          },
+          {
+            "name": "Ardabil",
+            "nameFa": "اردبیل"
+          },
+          {
+            "name": "Isfahan",
+            "nameFa": "اصفهان"
+          },
+          {
+            "name": "Alborz",
+            "nameFa": "البرز"
+          },
+          {
+            "name": "Ilam",
+            "nameFa": "ایلام"
+          },
+          {
+            "name": "Bushehr",
+            "nameFa": "بوشهر"
+          },
+          {
+            "name": "Tehran",
+            "nameFa": "تهران"
+          },
+          {
+            "name": "Razavi Khorasan",
+            "nameFa": "خراسان رضوی"
+          },
+          {
+            "name": "North Khorasan",
+            "nameFa": "خراسان شمالی"
+          },
+          {
+            "name": "Zanjan",
+            "nameFa": "زنجان"
+          },
+          {
+            "name": "Semnan",
+            "nameFa": "سمنان"
+          },
+          {
+            "name": "Sistan and Baluchestan",
+            "nameFa": "سیستان و بلوچستان"
+          },
+          {
+            "name": "Fars",
+            "nameFa": "فارس"
+          },
+          {
+            "name": "Qazvin",
+            "nameFa": "قزوین"
+          },
+          {
+            "name": "Kurdistan",
+            "nameFa": "کردستان"
+          },
+          {
+            "name": "Kerman",
+            "nameFa": "کرمان"
+          },
+          {
+            "name": "Kermanshah",
+            "nameFa": "کرمانشاه"
+          },
+          {
+            "name": "Kohgiluyeh and Boyer-Ahmad",
+            "nameFa": "کهگیلویه و بویراحمد"
+          },
+          {
+            "name": "Gilan",
+            "nameFa": "گیلان"
+          },
+          {
+            "name": "Lorestan",
+            "nameFa": "لرستان"
+          },
+          {
+            "name": "Mazandaran",
+            "nameFa": "مازندران"
+          },
+          {
+            "name": "Markazi",
+            "nameFa": "مرکزی"
+          },
+          {
+            "name": "Hormozgan",
+            "nameFa": "هرمزگان"
+          },
+          {
+            "name": "Hamadan",
+            "nameFa": "همدان"
+          }
+        ],
+        "cities": [
+          {
+            "name": "Tehran",
+            "nameFa": "تهران",
+            "province": "Tehran",
+            "lat": 35.6892,
+            "lon": 51.389
+          },
+          {
+            "name": "Semnan",
+            "nameFa": "سمنان",
+            "province": "Semnan",
+            "lat": 35.5729,
+            "lon": 53.3971
+          },
+          {
+            "name": "Isfahan",
+            "nameFa": "اصفهان",
+            "province": "Isfahan",
+            "lat": 32.6546,
+            "lon": 51.668
+          },
+          {
+            "name": "Kerman",
+            "nameFa": "کرمان",
+            "province": "Kerman",
+            "lat": 30.2839,
+            "lon": 57.0834
+          },
+          {
+            "name": "Bushehr",
+            "nameFa": "بوشهر",
+            "province": "Bushehr",
+            "lat": 28.9234,
+            "lon": 50.8203
+          },
+          {
+            "name": "Ilam",
+            "nameFa": "ایلام",
+            "province": "Ilam",
+            "lat": 33.6374,
+            "lon": 46.4227
+          },
+          {
+            "name": "Kermanshah",
+            "nameFa": "کرمانشاه",
+            "province": "Kermanshah",
+            "lat": 34.3142,
+            "lon": 47.065
+          },
+          {
+            "name": "Hamadan",
+            "nameFa": "همدان",
+            "province": "Hamadan",
+            "lat": 34.7988,
+            "lon": 48.515
+          },
+          {
+            "name": "Zanjan",
+            "nameFa": "زنجان",
+            "province": "Zanjan",
+            "lat": 36.6736,
+            "lon": 48.4787
+          },
+          {
+            "name": "Ardabil",
+            "nameFa": "اردبیل",
+            "province": "Ardabil",
+            "lat": 38.2498,
+            "lon": 48.2933
+          },
+          {
+            "name": "Qazvin",
+            "nameFa": "قزوین",
+            "province": "Qazvin",
+            "lat": 36.2688,
+            "lon": 50.0041
+          }
+        ],
+        "locations": [
+          {
+            "name": "Tehran",
+            "nameFa": "تهران",
+            "province": "Tehran",
+            "lat": 35.6892,
+            "lon": 51.389,
+            "kind": "city"
+          },
+          {
+            "name": "Semnan",
+            "nameFa": "سمنان",
+            "province": "Semnan",
+            "lat": 35.5729,
+            "lon": 53.3971,
+            "kind": "city"
+          },
+          {
+            "name": "Isfahan",
+            "nameFa": "اصفهان",
+            "province": "Isfahan",
+            "lat": 32.6546,
+            "lon": 51.668,
+            "kind": "city"
+          },
+          {
+            "name": "Kerman",
+            "nameFa": "کرمان",
+            "province": "Kerman",
+            "lat": 30.2839,
+            "lon": 57.0834,
+            "kind": "city"
+          },
+          {
+            "name": "Bushehr",
+            "nameFa": "بوشهر",
+            "province": "Bushehr",
+            "lat": 28.9234,
+            "lon": 50.8203,
+            "kind": "city"
+          },
+          {
+            "name": "Ilam",
+            "nameFa": "ایلام",
+            "province": "Ilam",
+            "lat": 33.6374,
+            "lon": 46.4227,
+            "kind": "city"
+          },
+          {
+            "name": "Kermanshah",
+            "nameFa": "کرمانشاه",
+            "province": "Kermanshah",
+            "lat": 34.3142,
+            "lon": 47.065,
+            "kind": "city"
+          },
+          {
+            "name": "Hamadan",
+            "nameFa": "همدان",
+            "province": "Hamadan",
+            "lat": 34.7988,
+            "lon": 48.515,
+            "kind": "city"
+          },
+          {
+            "name": "Zanjan",
+            "nameFa": "زنجان",
+            "province": "Zanjan",
+            "lat": 36.6736,
+            "lon": 48.4787,
+            "kind": "city"
+          },
+          {
+            "name": "Ardabil",
+            "nameFa": "اردبیل",
+            "province": "Ardabil",
+            "lat": 38.2498,
+            "lon": 48.2933,
+            "kind": "city"
+          },
+          {
+            "name": "Qazvin",
+            "nameFa": "قزوین",
+            "province": "Qazvin",
+            "lat": 36.2688,
+            "lon": 50.0041,
+            "kind": "city"
+          },
+          {
+            "name": "East Azerbaijan",
+            "nameFa": "آذربایجان شرقی",
+            "province": "East Azerbaijan",
+            "lat": 38.0962,
+            "lon": 46.2738,
+            "kind": "province"
+          },
+          {
+            "name": "West Azerbaijan",
+            "nameFa": "آذربایجان غربی",
+            "province": "West Azerbaijan",
+            "lat": 37.5527,
+            "lon": 45.0761,
+            "kind": "province"
+          },
+          {
+            "name": "Alborz",
+            "nameFa": "البرز",
+            "province": "Alborz",
+            "lat": 35.84,
+            "lon": 50.9391,
+            "kind": "province"
+          },
+          {
+            "name": "Razavi Khorasan",
+            "nameFa": "خراسان رضوی",
+            "province": "Razavi Khorasan",
+            "lat": 36.2605,
+            "lon": 59.6168,
+            "kind": "province"
+          },
+          {
+            "name": "North Khorasan",
+            "nameFa": "خراسان شمالی",
+            "province": "North Khorasan",
+            "lat": 37.4753,
+            "lon": 57.3324,
+            "kind": "province"
+          },
+          {
+            "name": "Sistan and Baluchestan",
+            "nameFa": "سیستان و بلوچستان",
+            "province": "Sistan and Baluchestan",
+            "lat": null,
+            "lon": null,
+            "kind": "province"
+          },
+          {
+            "name": "Fars",
+            "nameFa": "فارس",
+            "province": "Fars",
+            "lat": 29.5918,
+            "lon": 52.5837,
+            "kind": "province"
+          },
+          {
+            "name": "Kurdistan",
+            "nameFa": "کردستان",
+            "province": "Kurdistan",
+            "lat": 35.3219,
+            "lon": 46.9862,
+            "kind": "province"
+          },
+          {
+            "name": "Kohgiluyeh and Boyer-Ahmad",
+            "nameFa": "کهگیلویه و بویراحمد",
+            "province": "Kohgiluyeh and Boyer-Ahmad",
+            "lat": null,
+            "lon": null,
+            "kind": "province"
+          },
+          {
+            "name": "Gilan",
+            "nameFa": "گیلان",
+            "province": "Gilan",
+            "lat": 37.2808,
+            "lon": 49.5832,
+            "kind": "province"
+          },
+          {
+            "name": "Lorestan",
+            "nameFa": "لرستان",
+            "province": "Lorestan",
+            "lat": 33.4878,
+            "lon": 48.3558,
+            "kind": "province"
+          },
+          {
+            "name": "Mazandaran",
+            "nameFa": "مازندران",
+            "province": "Mazandaran",
+            "lat": 36.5659,
+            "lon": 53.0586,
+            "kind": "province"
+          },
+          {
+            "name": "Markazi",
+            "nameFa": "مرکزی",
+            "province": "Markazi",
+            "lat": 34.0917,
+            "lon": 49.6892,
+            "kind": "province"
+          },
+          {
+            "name": "Hormozgan",
+            "nameFa": "هرمزگان",
+            "province": "Hormozgan",
+            "lat": 27.1832,
+            "lon": 56.2666,
+            "kind": "province"
+          }
+        ]
+      },
+      "detailFetched": true
+    },
+    {
+      "id": "irimo-orange-هشدار-هواشناسی-سطح-نارنجی-شماره-57-جمعه-1405-07-17-هشدار-هواشناسی-سطح-زرد-شماره-",
+      "provider": "IRIMO",
+      "level": "orange",
+      "levelFa": "هشدار نارنجی",
+      "severity": "severe",
+      "title": "هشدار هواشناسی-سطح نارنجی شماره 57 جمعه 1405/07/17(هشدار هواشناسی سطح زرد شماره 76 اعتبار دارد)",
+      "date": null,
+      "url": "https://www.irimo.ir/far/services/news/1182699-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D9%86%D8%A7%D8%B1%D9%86%D8%AC%DB%8C-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%AC%D9%85%D8%B9%D9%87-1405-07-17-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%A7%D8%B9%D8%AA%D8%A8%D8%A7%D8%B1-%D8%AF%D8%A7%D8%B1%D8%AF-.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "شنبه ۱۴۰۵/۰۷/۱۸: گیلان، مازندران، گلستان، خراسان شمالی، شمال خراسان رضوی، دامنه و ارتفاعات سمنان، یکشنبه ۱۴۰۵/۰۷/۱۹: مازندران، گلستان، خراسان شمالی و شمال خراسان رضوی",
+        "provinces": [
+          {
+            "name": "Razavi Khorasan",
+            "nameFa": "خراسان رضوی"
+          },
+          {
+            "name": "North Khorasan",
+            "nameFa": "خراسان شمالی"
+          },
+          {
+            "name": "Semnan",
+            "nameFa": "سمنان"
+          },
+          {
+            "name": "Golestan",
+            "nameFa": "گلستان"
+          },
+          {
+            "name": "Gilan",
+            "nameFa": "گیلان"
+          },
+          {
+            "name": "Mazandaran",
+            "nameFa": "مازندران"
+          }
+        ],
+        "cities": [
+          {
+            "name": "Semnan",
+            "nameFa": "سمنان",
+            "province": "Semnan",
+            "lat": 35.5729,
+            "lon": 53.3971
+          }
+        ],
+        "locations": [
+          {
+            "name": "Semnan",
+            "nameFa": "سمنان",
+            "province": "Semnan",
+            "lat": 35.5729,
+            "lon": 53.3971,
+            "kind": "city"
+          },
+          {
+            "name": "Razavi Khorasan",
+            "nameFa": "خراسان رضوی",
+            "province": "Razavi Khorasan",
+            "lat": 36.2605,
+            "lon": 59.6168,
+            "kind": "province"
+          },
+          {
+            "name": "North Khorasan",
+            "nameFa": "خراسان شمالی",
+            "province": "North Khorasan",
+            "lat": 37.4753,
+            "lon": 57.3324,
+            "kind": "province"
+          },
+          {
+            "name": "Golestan",
+            "nameFa": "گلستان",
+            "province": "Golestan",
+            "lat": 36.8456,
+            "lon": 54.4393,
+            "kind": "province"
+          },
+          {
+            "name": "Gilan",
+            "nameFa": "گیلان",
+            "province": "Gilan",
+            "lat": 37.2808,
+            "lon": 49.5832,
+            "kind": "province"
+          },
+          {
+            "name": "Mazandaran",
+            "nameFa": "مازندران",
+            "province": "Mazandaran",
+            "lat": 36.5659,
+            "lon": 53.0586,
+            "kind": "province"
+          }
+        ]
+      },
+      "detailFetched": true
+    },
+    {
+      "id": "irimo-yellow-هشدار-هواشناسی-دریایی-سطح-زرد-شماره-75-سازمان-مرکزی-جمعه-مورخ-1405-07-17-هشدار-ه",
+      "provider": "IRIMO",
+      "level": "yellow",
+      "levelFa": "هشدار زرد",
+      "severity": "warning",
+      "title": "هشدار هواشناسی دریایی-سطح زرد شماره 75 سازمان مرکزی، جمعه مورخ 1405/07/17(هشدار هواشناسی دریایی-سطح زرد شماره 74 اعتبار دارد.)",
+      "date": "1405/07/17",
+      "url": "https://www.irimo.ir/far/services/news/1182700-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%AF%D8%B1%DB%8C%D8%A7%DB%8C%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B3%D8%A7%D8%B2%D9%85%D8%A7%D9%86-%D9%85%D8%B1%DA%A9%D8%B2%DB%8C-%D8%AC%D9%85%D8%B9%D9%87-%D9%85%D9%88%D8%B1%D8%AE-1405-07-17-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%AF%D8%B1%DB%8C%D8%A7%DB%8C%DB%8C-%D8%B3%D8%B7%D8%AD-.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-yellow-هشدار-هواشناسی-دریایی-سطح-زرد-شماره-74-سازمان-مرکزی-پنج-شنبه-1405-07-16-با-اعتبا",
+      "provider": "IRIMO",
+      "level": "yellow",
+      "levelFa": "هشدار زرد",
+      "severity": "warning",
+      "title": "هشدار هواشناسی دریایی-سطح زرد شماره 74 سازمان مرکزی پنج شنبه 1405/07/16 (با اعتبار هشدار هواشناسی دریایی-سطح زرد شماره 73)",
+      "date": null,
+      "url": "https://www.irimo.ir/far/services/news/1182694-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%AF%D8%B1%DB%8C%D8%A7%DB%8C%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B3%D8%A7%D8%B2%D9%85%D8%A7%D9%86-%D9%85%D8%B1%DA%A9%D8%B2%DB%8C-%D9%BE%D9%86%D8%AC-%D8%B4%D9%86%D8%A8%D9%87-1405-07-16-%D8%A8%D8%A7-%D8%A7%D8%B9%D8%AA%D8%A8%D8%A7%D8%B1-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-yellow-هشدار-هواشناسی-دریایی-سطح-زرد-شماره-73-سازمان-مرکزی-چهارشنبه-1405-07-15",
+      "provider": "IRIMO",
+      "level": "yellow",
+      "levelFa": "هشدار زرد",
+      "severity": "warning",
+      "title": "هشدار هواشناسی دریایی-سطح زرد شماره 73 سازمان مرکزی چهارشنبه 1405/07/15",
+      "date": null,
+      "url": "https://www.irimo.ir/far/services/news/1182676-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%AF%D8%B1%DB%8C%D8%A7%DB%8C%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B3%D8%A7%D8%B2%D9%85%D8%A7%D9%86-%D9%85%D8%B1%DA%A9%D8%B2%DB%8C-%DA%86%D9%87%D8%A7%D8%B1%D8%B4%D9%86%D8%A8%D9%87-1405-07-15.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-yellow-هشدار-هواشناسی-سطح-زرد-شماره-76-سازمان-مرکزی-چهارشنبه-مورخ-1405-07-15",
+      "provider": "IRIMO",
+      "level": "yellow",
+      "levelFa": "هشدار زرد",
+      "severity": "warning",
+      "title": "هشدار هواشناسی-سطح زرد شماره 76 سازمان مرکزی چهارشنبه مورخ 1405/07/15",
+      "date": "1405/07/15",
+      "url": "https://www.irimo.ir/far/services/news/1182677-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B3%D8%A7%D8%B2%D9%85%D8%A7%D9%86-%D9%85%D8%B1%DA%A9%D8%B2%DB%8C-%DA%86%D9%87%D8%A7%D8%B1%D8%B4%D9%86%D8%A8%D9%87-%D9%85%D9%88%D8%B1%D8%AE-1405-07-15.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-orange-هشدار-هواشناسی-سطح-نارنجی-شماره-56-دوشنبه-1405-07-13",
+      "provider": "IRIMO",
+      "level": "orange",
+      "levelFa": "هشدار نارنجی",
+      "severity": "severe",
+      "title": "هشدار هواشناسی-سطح نارنجی شماره 56 دوشنبه 1405/07/13",
+      "date": null,
+      "url": "https://www.irimo.ir/far/services/news/1182571-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D9%86%D8%A7%D8%B1%D9%86%D8%AC%DB%8C-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%AF%D9%88%D8%B4%D9%86%D8%A8%D9%87-1405-07-13.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-yellow-هشدار-هواشناسی-دریایی-سطح-زرد-شماره-72-سازمان-مرکزی-شنبه-1405-07-11-هشدار-هواشنا",
+      "provider": "IRIMO",
+      "level": "yellow",
+      "levelFa": "هشدار زرد",
+      "severity": "warning",
+      "title": "هشدار هواشناسی دریایی-سطح زرد شماره 72 سازمان مرکزی شنبه 1405/07/11 (هشدار هواشناسی دریایی-سطح نارنجی شماره 28 اعتبار دارد.)",
+      "date": null,
+      "url": "https://www.irimo.ir/far/services/news/1182537-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%AF%D8%B1%DB%8C%D8%A7%DB%8C%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B3%D8%A7%D8%B2%D9%85%D8%A7%D9%86-%D9%85%D8%B1%DA%A9%D8%B2%DB%8C-%D8%B4%D9%86%D8%A8%D9%87-1405-07-11-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%AF%D8%B1%DB%8C%D8%A7%DB%8C%DB%8C-%D8%B3%D8%B7%D8%AD-%D9%86%D8%A7%D8%B1%D9%86%D8%AC%DB%8C-.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-yellow-هشدار-هواشناسی-سطح-زرد-شماره-75-شنبه-مورخ-1405-07-11",
+      "provider": "IRIMO",
+      "level": "yellow",
+      "levelFa": "هشدار زرد",
+      "severity": "warning",
+      "title": "هشدار هواشناسی-سطح زرد شماره 75 شنبه مورخ 1405/07/11",
+      "date": "1405/07/11",
+      "url": "https://www.irimo.ir/far/services/news/1182539-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B4%D9%86%D8%A8%D9%87-%D9%85%D9%88%D8%B1%D8%AE-1405-07-11.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-orange-هشدار-هواشناسی-سطح-نارنجی-شماره-55-شنبه-مورخ-1405-07-11",
+      "provider": "IRIMO",
+      "level": "orange",
+      "levelFa": "هشدار نارنجی",
+      "severity": "severe",
+      "title": "هشدار هواشناسی-سطح نارنجی شماره 55 شنبه مورخ 1405/07/11",
+      "date": "1405/07/11",
+      "url": "https://www.irimo.ir/far/services/news/1182540-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D9%86%D8%A7%D8%B1%D9%86%D8%AC%DB%8C-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B4%D9%86%D8%A8%D9%87-%D9%85%D9%88%D8%B1%D8%AE-1405-07-11.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-orange-هشدار-هواشناسی-دریایی-سطح-نارنجی-شماره-28-پنجشنبه-مورخ-1405-07-09",
+      "provider": "IRIMO",
+      "level": "orange",
+      "levelFa": "هشدار نارنجی",
+      "severity": "severe",
+      "title": "هشدار هواشناسی دریایی-سطح نارنجی شماره 28 پنجشنبه مورخ 1405/07/09",
+      "date": "1405/07/09",
+      "url": "https://www.irimo.ir/far/services/news/1182519-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%AF%D8%B1%DB%8C%D8%A7%DB%8C%DB%8C-%D8%B3%D8%B7%D8%AD-%D9%86%D8%A7%D8%B1%D9%86%D8%AC%DB%8C-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D9%BE%D9%86%D8%AC%D8%B4%D9%86%D8%A8%D9%87-%D9%85%D9%88%D8%B1%D8%AE-1405-07-09.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-orange-هشدار-هواشناسی-سطح-نارنجی-شماره-54-پنج-شنبه-1405-07-09",
+      "provider": "IRIMO",
+      "level": "orange",
+      "levelFa": "هشدار نارنجی",
+      "severity": "severe",
+      "title": "هشدار هواشناسی-سطح نارنجی شماره 54 پنج شنبه 1405/07/09",
+      "date": null,
+      "url": "https://www.irimo.ir/far/services/news/1182521-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D9%86%D8%A7%D8%B1%D9%86%D8%AC%DB%8C-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D9%BE%D9%86%D8%AC-%D8%B4%D9%86%D8%A8%D9%87-1405-07-09.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-yellow-هشدار-هواشناسی-سطح-زرد-شماره-74-چهارشنبه-1405-07-08-سامانه-دوم-هشدار-هواشناسی-زر",
+      "provider": "IRIMO",
+      "level": "yellow",
+      "levelFa": "هشدار زرد",
+      "severity": "warning",
+      "title": "هشدار هواشناسی-سطح زرد شماره 74 چهارشنبه 1405/07/08 (سامانه دوم هشدار هواشناسی زرد شماره 73 اعتبار دارد)",
+      "date": null,
+      "url": "https://www.irimo.ir/far/services/news/1182515-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%DA%86%D9%87%D8%A7%D8%B1%D8%B4%D9%86%D8%A8%D9%87-1405-07-08-%D8%B3%D8%A7%D9%85%D8%A7%D9%86%D9%87-%D8%AF%D9%88%D9%85-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%A7%D8%B9%D8%AA%D8%A8%D8%A7%D8%B1-%D8%AF%D8%A7%D8%B1%D8%AF-.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-yellow-هشدار-هواشناسی-دریایی-سطح-زرد-شماره-71-سازمان-مرکزی-دوشنبه-1405-07-06-هشدار-هواش",
+      "provider": "IRIMO",
+      "level": "yellow",
+      "levelFa": "هشدار زرد",
+      "severity": "warning",
+      "title": "هشدار هواشناسی دریایی-سطح زرد شماره 71 سازمان مرکزی دوشنبه 1405/07/06(هشدار هواشناسی دریایی-سطح زرد شماره 70 اعتبار دارد.)",
+      "date": null,
+      "url": "https://www.irimo.ir/far/services/news/1182481-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%AF%D8%B1%DB%8C%D8%A7%DB%8C%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B3%D8%A7%D8%B2%D9%85%D8%A7%D9%86-%D9%85%D8%B1%DA%A9%D8%B2%DB%8C-%D8%AF%D9%88%D8%B4%D9%86%D8%A8%D9%87-1405-07-06-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%AF%D8%B1%DB%8C%D8%A7%DB%8C%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-orange-هشدار-هواشناسی-سطح-نارنجی-شماره-53-دوشنبه-مورخ-1405-07-06",
+      "provider": "IRIMO",
+      "level": "orange",
+      "levelFa": "هشدار نارنجی",
+      "severity": "severe",
+      "title": "هشدار هواشناسی-سطح نارنجی شماره 53 دوشنبه مورخ 1405/07/06",
+      "date": "1405/07/06",
+      "url": "https://www.irimo.ir/far/services/news/1182491-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D9%86%D8%A7%D8%B1%D9%86%D8%AC%DB%8C-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%AF%D9%88%D8%B4%D9%86%D8%A8%D9%87-%D9%85%D9%88%D8%B1%D8%AE-1405-07-06.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-yellow-هشدار-هواشناسی-دریایی-سطح-زرد-شماره-70-سازمان-مرکزی-مورخ-1405-07-04-هشدار-هواشنا",
+      "provider": "IRIMO",
+      "level": "yellow",
+      "levelFa": "هشدار زرد",
+      "severity": "warning",
+      "title": "هشدار هواشناسی دریایی-سطح زرد شماره 70 سازمان مرکزی مورخ 1405/07/04(هشدار هواشناسی دریایی-سطح نارنجی شماره 27 اعتبار دارد)",
+      "date": "1405/07/04",
+      "url": "https://www.irimo.ir/far/services/news/1182472-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%AF%D8%B1%DB%8C%D8%A7%DB%8C%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B3%D8%A7%D8%B2%D9%85%D8%A7%D9%86-%D9%85%D8%B1%DA%A9%D8%B2%DB%8C-%D9%85%D9%88%D8%B1%D8%AE-1405-07-04-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%AF%D8%B1%DB%8C%D8%A7%DB%8C%DB%8C-%D8%B3%D8%B7%D8%AD-%D9%86%D8%A7%D8%B1%D9%86%D8%AC%DB%8C-.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-orange-هشدار-هواشناسی-سطح-نارنجی-شماره-52-شنبه-1405-07-04",
+      "provider": "IRIMO",
+      "level": "orange",
+      "levelFa": "هشدار نارنجی",
+      "severity": "severe",
+      "title": "هشدار هواشناسی-سطح نارنجی شماره 52 شنبه 1405/07/04",
+      "date": null,
+      "url": "https://www.irimo.ir/far/services/news/1182473-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D9%86%D8%A7%D8%B1%D9%86%D8%AC%DB%8C-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B4%D9%86%D8%A8%D9%87-1405-07-04.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    },
+    {
+      "id": "irimo-yellow-هشدار-هواشناسی-سطح-زرد-شماره-73-شنبه-1405-07-04",
+      "provider": "IRIMO",
+      "level": "yellow",
+      "levelFa": "هشدار زرد",
+      "severity": "warning",
+      "title": "هشدار هواشناسی-سطح زرد شماره 73 شنبه 1405/07/04",
+      "date": null,
+      "url": "https://www.irimo.ir/far/services/news/1182477-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C-%D8%B3%D8%B7%D8%AD-%D8%B2%D8%B1%D8%AF-%D8%B4%D9%85%D8%A7%D8%B1%D9%87-%D8%B4%D9%86%D8%A8%D9%87-1405-07-04.html?t=%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C",
+      "sourceUrl": "https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html",
+      "live": false,
+      "status": "official-bulletin",
+      "location": {
+        "affectedArea": "",
+        "provinces": [],
+        "cities": [],
+        "locations": []
+      },
+      "detailFetched": false
+    }
+  ]
 }
