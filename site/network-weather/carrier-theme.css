@@ -13,3 +13,19 @@ body{background:radial-gradient(circle at 12% -18%,rgba(55,218,209,.16),transpar
 .timeline-wrap input{accent-color:#18c7a5}
 .timeline-segments .future{background:linear-gradient(90deg,var(--fiber-cyan),#18c7a5)}
 .story-row.active{background:linear-gradient(90deg,rgba(55,218,209,.12),rgba(24,199,165,.1))}
+
+/* Neutral-base mode: remove the blue cast from navy surfaces and map chrome. */
+:root{--bg:#0b0d0d;--panel:#121616;--panel-2:#1a211f;--line:rgba(177,196,187,.22);--faint:#87958f;--blue:#18c7a5;--mci-magenta:#18c7a5;--magenta:#18c7a5}
+html,body{background:#0b0d0d;color:#f2f5f3}
+body{background:radial-gradient(circle at 12% -18%,rgba(55,218,209,.13),transparent 30%),radial-gradient(circle at 92% 8%,rgba(24,199,165,.1),transparent 28%),linear-gradient(145deg,#0b0d0d 0%,#111715 54%,#080a0a 100%)}
+.topbar,.app-shell{background:rgba(10,13,12,.94)}
+.panel,.kpi-card,.broadcast-crawl,.map-data-strip,.detail-panel,.story-panel{background:linear-gradient(145deg,rgba(20,25,23,.97),rgba(12,15,14,.98));border-color:rgba(177,196,187,.22)}
+.ghost-btn,.mini-control,.chip,.text-btn{background:rgba(29,35,32,.9);border-color:rgba(177,196,187,.28)}
+.map-canvas{background:#111513;border-color:rgba(55,218,209,.34);box-shadow:inset 0 0 70px rgba(0,0,0,.5),0 0 32px rgba(55,218,209,.08)}
+.map-grid{background-image:linear-gradient(rgba(151,180,166,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(151,180,166,.08) 1px,transparent 1px)}
+.iran-outline{fill:rgba(31,52,43,.96);stroke:var(--fiber-cyan)}
+.map-hud{background:linear-gradient(90deg,rgba(11,15,13,.96),rgba(11,15,13,.72))}
+.map-overlay,.map-foot{background:rgba(11,15,13,.92);border-color:rgba(177,196,187,.22)}
+.alert-row,.irimo-warning,.ops-table tbody tr,.ops-stat,.ops-source-list>div{background:rgba(27,34,30,.78);border-color:rgba(177,196,187,.2)}
+.timeline-wrap{background:rgba(12,16,14,.78);border-color:rgba(177,196,187,.22)}
+.map-canvas[data-layer="technology"] .weather-radar-field{background:radial-gradient(circle at 68% 38%,rgba(24,199,165,.28),transparent 30%),linear-gradient(135deg,rgba(25,54,43,.56),rgba(24,38,31,.48))}
