@@ -5,28 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#07111f" />
   <title>Network Weather · Telecom Operations Forecast</title>
-  <link rel="stylesheet" href="/network-weather/styles.css?v=20261013-26" />
-  <link rel="stylesheet" href="/network-weather/ticker.css?v=20261013-26" />
+  <link rel="stylesheet" href="./styles.css?v=20261016-1" />
+  <link rel="stylesheet" href="./ticker.css?v=20261016-1" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <div class="brand"><span class="brand-mark">NW</span><div><strong>NETWORK WEATHER</strong><small>Telecom operations forecast</small></div></div>
-      <div class="topbar-actions"><span class="live-dot"><i></i> DEMO FEED</span><button class="ghost-btn" id="presenter-btn">Presenter mode</button><button class="ghost-btn" id="fullscreen-btn">Fullscreen</button><button class="ghost-btn" id="motion-btn">Reduce motion</button></div>
+      <div class="topbar-actions"><span class="live-dot"><i></i> DEMO SCENARIO</span><button class="ghost-btn" id="presenter-btn" aria-pressed="false">Presenter mode</button><button class="ghost-btn" id="fullscreen-btn">Fullscreen</button><button class="ghost-btn" id="motion-btn" aria-pressed="false">Reduce motion</button></div>
     </header>
 
     <main>
       <section class="forecast-header">
-        <div><p class="eyebrow">Iran network · Tehran focus · Tuesday, 13 October 2026</p><h1 id="headline">Mostly clear network conditions</h1><p class="subhead" id="headline-detail">Strong availability across the network with isolated pressure building toward the evening peak.</p></div>
+        <div><p class="eyebrow">Iran network · Tehran focus · <span id="scenario-date">Demo scenario</span></p><h1 id="headline">Mostly clear network conditions</h1><p class="subhead" id="headline-detail">Strong availability across the network with isolated pressure building toward the evening peak.</p></div>
         <div class="condition-badge" id="condition-badge"><span id="condition-icon">☀</span><div><strong id="condition-label">CLEAR</strong><small id="condition-meta">Observed · 14:00 IRST</small></div></div>
       </section>
       <div class="ticker-bar" role="status" aria-live="polite"><strong>SEVERE NETWORK WEATHER BULLETIN</strong><span id="ticker-text">Eastern corridor interference observed · North ridge congestion watch at 18:00 · Airport maintenance planned at 21:00</span></div>
-      <div class="broadcast-crawl" aria-label="Broadcast summary"><span><b>NOW</b><strong id="broadcast-now">Observed · 14:00 IRST</strong></span><span><b>NEXT</b><strong id="broadcast-next">Peak pressure · 18:00 IRST</strong></span><span><b>WATCH</b><strong id="broadcast-risk">East interference · Airport maintenance</strong></span><span><b>FEED</b><strong>IRIMO official warnings · live parser</strong></span></div>
+      <div class="broadcast-crawl" aria-label="Broadcast summary"><span><b>NOW</b><strong id="broadcast-now">Observed · 14:00 IRST</strong></span><span><b>NEXT</b><strong id="broadcast-next">Peak pressure · 18:00 IRST</strong></span><span><b>WATCH</b><strong id="broadcast-risk">East interference · Airport maintenance</strong></span><span><b>SOURCES</b><strong id="broadcast-source">Demo telemetry · IRIMO warnings separate</strong></span></div>
 
       <section class="broadcast-grid">
         <article class="map-panel panel">
           <div class="panel-heading"><div><span class="section-kicker">LIVE IRAN NETWORK MAP</span><h2>Iran network weather radar</h2></div><div class="map-tools"><button class="chip active" data-layer="condition">Conditions</button><button class="chip" data-layer="warnings">IRIMO warnings</button><button class="chip" data-layer="coverage">Coverage</button><button class="chip" data-layer="traffic">Traffic</button><button class="chip" data-layer="congestion">Congestion</button><button class="chip" data-layer="latency">Latency</button><button class="chip" data-layer="incidents">Incidents</button><button class="chip" data-layer="maintenance">Maintenance</button><button class="chip" data-layer="technology">Technology</button></div></div>
-          <div class="map-canvas" id="map-canvas" role="img" aria-label="Interactive Iran telecom weather map with province-aligned forecasts, IRIMO warning severity, regional hubs, and sample site clusters"><div class="map-grid"></div><div class="weather-radar-field"></div><div class="country-glow"></div><div class="map-hud"><div><span class="map-hud-kicker"><i></i> Live telecom operations</span><strong id="map-hud-layer">Conditions</strong></div><div class="map-hud-stats"><span id="map-hud-time">14:00 IRST</span><span id="map-hud-warnings">IRIMO feed loading</span></div></div><svg class="iran-map" viewBox="0 0 760 500" aria-hidden="true"><path class="iran-outline" d="M106 148 146 126 181 132 209 112 255 119 281 100 325 112 358 96 402 111 436 105 472 127 505 132 534 157 572 175 594 207 581 233 603 261 592 292 614 317 596 349 561 354 541 384 503 391 477 421 438 411 405 435 370 423 343 403 309 414 280 392 244 397 220 369 184 356 168 322 141 301 151 270 128 237 145 208 123 181Z"/><path class="iran-ridge" d="M145 178 210 155 277 162 340 140 410 151 476 155 540 194 563 238 548 280 575 316 535 335 495 365 433 375 381 397 329 380 278 371 222 350 190 316 164 274 178 231Z"/></svg><div id="weather-layer" aria-label="Province weather and warning markers"></div><div id="warning-layer" aria-label="IRIMO warning markers"></div><div id="site-layer"></div><div class="map-overlay"><span><i class="legend-swatch clear"></i> Sunny</span><span><i class="legend-swatch cloud"></i> Cloud</span><span><i class="legend-swatch rain"></i> Rain</span><span><i class="legend-swatch storm"></i> Storm</span><span><i class="legend-swatch warning"></i> IRIMO alert outline</span><span><i class="legend-swatch site"></i> Site cluster</span></div></div>
+          <div class="map-canvas" id="map-canvas" aria-label="Interactive Iran telecom weather map with province-aligned forecasts, IRIMO warning severity, regional hubs, and sample site clusters"><div class="map-grid"></div><div class="weather-radar-field"></div><div class="country-glow"></div><div class="map-hud"><div><span class="map-hud-kicker"><i></i> Demo operations scenario</span><strong id="map-hud-layer">Conditions</strong></div><div class="map-hud-stats"><span id="map-hud-time">14:00 IRST</span><span id="map-hud-warnings">IRIMO feed loading</span></div></div><svg class="iran-map" viewBox="0 0 760 500" aria-hidden="true"><path class="iran-outline" d="M106 148 146 126 181 132 209 112 255 119 281 100 325 112 358 96 402 111 436 105 472 127 505 132 534 157 572 175 594 207 581 233 603 261 592 292 614 317 596 349 561 354 541 384 503 391 477 421 438 411 405 435 370 423 343 403 309 414 280 392 244 397 220 369 184 356 168 322 141 301 151 270 128 237 145 208 123 181Z"/><path class="iran-ridge" d="M145 178 210 155 277 162 340 140 410 151 476 155 540 194 563 238 548 280 575 316 535 335 495 365 433 375 381 397 329 380 278 371 222 350 190 316 164 274 178 231Z"/></svg><div id="weather-layer" aria-label="Province weather and warning markers"></div><div id="warning-layer" aria-label="IRIMO warning markers"></div><div id="site-layer"></div><div class="map-overlay"><span><i class="legend-swatch clear"></i> Sunny</span><span><i class="legend-swatch cloud"></i> Cloud</span><span><i class="legend-swatch rain"></i> Rain</span><span><i class="legend-swatch storm"></i> Storm</span><span><i class="legend-swatch warning"></i> IRIMO alert outline</span><span><i class="legend-swatch site"></i> Demo site cluster</span></div></div>
           <div class="map-foot"><span id="map-scope">Iran · 31 provinces · province forecasts · live IRIMO overlay · 12 site clusters</span><span id="map-layer-label">Condition layer</span><a id="map-source" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">Boundary: OSM-derived GeoJSON · © OSM</a><button class="text-btn" id="pan-left" aria-label="Pan map left">←</button><button class="text-btn" id="pan-up" aria-label="Pan map up">↑</button><button class="text-btn" id="pan-down" aria-label="Pan map down">↓</button><button class="text-btn" id="pan-right" aria-label="Pan map right">→</button><button class="text-btn" id="zoom-out" aria-label="Zoom out">−</button><button class="text-btn" id="zoom-reset" aria-label="Reset map zoom">100%</button><button class="text-btn" id="zoom-in" aria-label="Zoom in">+</button><button class="text-btn" id="reset-map">Reset view ↺</button></div>
           <div class="map-data-strip" id="map-data-strip" aria-label="Illustrative national telecom summary"></div>
         </article>
@@ -38,6 +38,24 @@
       </section>
 
       <section class="kpi-grid" id="kpi-grid"></section>
+
+      <section class="operations-panel panel" aria-labelledby="operations-title">
+        <div class="panel-heading">
+          <div><span class="section-kicker">OPERATIONS CONTROL ROOM</span><h2 id="operations-title">Network evidence &amp; capacity watch</h2></div>
+          <span class="ops-mode" id="ops-mode">DEMO TELEMETRY</span>
+        </div>
+        <div class="ops-summary" id="ops-summary" aria-live="polite"></div>
+        <div class="ops-body">
+          <div class="ops-watchlist">
+            <div class="ops-subheading"><strong>Priority review queue</strong><span>Ranked by utilization, coverage, and incidents</span></div>
+            <div class="ops-table-wrap"><table class="ops-table"><thead><tr><th>Province</th><th>Traffic</th><th>Load</th><th>Coverage</th><th>Signal</th></tr></thead><tbody id="ops-watchlist"></tbody></table></div>
+          </div>
+          <div class="ops-sources">
+            <div class="ops-subheading"><strong>Evidence chain</strong><span>What the broadcast is based on</span></div>
+            <div id="ops-sources-list" class="ops-source-list"></div>
+          </div>
+        </div>
+      </section>
 
       <section class="timeline-panel panel">
         <div class="panel-heading"><div><span class="section-kicker">NETWORK FORECAST</span><h2>Time machine</h2></div><div class="time-mode"><button class="mini-control" id="prev-btn" aria-label="Previous forecast frame">← Previous</button><button class="mini-control" id="next-btn" aria-label="Next forecast frame">Next →</button><button class="mini-control" id="now-btn">Now</button><button class="mini-control" id="plus-hour-btn">+1 hour</button><button class="mini-control" id="tonight-btn">Tonight</button><button class="mini-control" id="tomorrow-btn">Tomorrow</button><button class="mini-control" id="play-btn">▶ Play</button><select id="speed-select" aria-label="Playback speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></div></div>
@@ -51,7 +69,7 @@
     </main>
     <footer class="footer"><span>Network Weather MVP · Illustrative data for presentation</span><span>Observed and forecast states are always labeled</span></footer>
   </div>
-  <script src="/network-weather/data.js?v=20261013-26"></script>
-  <script src="/network-weather/app.js?v=20261013-26"></script>
+  <script src="./data.js?v=20261016-1"></script>
+  <script src="./app.js?v=20261016-1"></script>
 </body>
 </html>

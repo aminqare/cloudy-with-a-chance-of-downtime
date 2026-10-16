@@ -1,7 +1,8 @@
 const api = window.NetworkWeatherApi;
 const $ = (selector) => document.querySelector(selector);
 const urlFrame = Number(new URLSearchParams(window.location.search).get('frame'));
-const state = { frame: Number.isInteger(urlFrame) && urlFrame >= 0 && urlFrame < 13 ? urlFrame : 6, playing: false, speed: 1, layer: 'condition', audience: 'executive', reducedMotion: false, story: 0, mapZoom: 1, mapX: 0, mapY: 0, acknowledgedAlerts: new Set(), irimoWarnings: [] };
+const state = { frame: Number.isInteger(urlFrame) && urlFrame >= 0 && urlFrame < 13 ? urlFrame : 6, playing: false, speed: 1, layer: 'condition', audience: 'executive', reducedMotion: false, story: 0, mapZoom: 1, mapX: 0, mapY: 0, acknowledgedAlerts: new Set(), irimoWarnings: [], irimoStatus: 'loading', selectedProvince: null };
+try { state.acknowledgedAlerts = new Set(JSON.parse(localStorage.getItem('network-weather-acknowledged') || '[]')); } catch { state.acknowledgedAlerts = new Set(); }
 const conditions = {
   clear: { label:'CLEAR', weather:'sunny', title:'Mostly clear network conditions', detail:'Strong availability across the metro with isolated pressure building toward the evening peak.', className:'clear' },
   cloud: { label:'PARTLY CLOUDY', weather:'partly', title:'Partly cloudy network conditions', detail:'Demand is rising across key corridors. Capacity remains healthy with localized congestion risk.', className:'cloud' },
@@ -79,8 +80,8 @@ function renderCityLabels(cities) {
 async function loadIranBoundary() {
   try {
     const [boundaryResponse, citiesResponse] = await Promise.all([
-      fetch('/network-weather/data/iran-provinces.geojson'),
-      fetch('/network-weather/data/iran-cities.json'),
+      fetch('./data/iran-provinces.geojson'),
+      fetch('./data/iran-cities.json'),
     ]);
     if (!boundaryResponse.ok || !citiesResponse.ok) throw new Error('Iran geography assets unavailable');
     const [boundary, cities] = await Promise.all([boundaryResponse.json(), citiesResponse.json()]);
@@ -95,23 +96,49 @@ function render() {
   const shareUrl = new URL(window.location.href); shareUrl.searchParams.set('frame', state.frame); window.history.replaceState({}, '', shareUrl);
   document.body.classList.toggle('reduced-motion', state.reducedMotion);
   $('#headline').textContent = condition.title; $('#headline-detail').textContent = condition.detail;
+  $('#scenario-date').textContent = `Demo scenario · ${frame.time} IRST`;
   $('#condition-icon').innerHTML = weatherIcon(condition.weather); $('#condition-label').textContent = condition.label;
   $('#condition-meta').textContent = `${frame.observed ? 'Observed' : 'Forecast'} · ${frame.time} IRST`;
   $('#condition-badge').className = `condition-badge ${condition.className}`;
   $('#narrative').textContent = narrative(frame);
-  $('#ticker-text').textContent = api.alerts.map((alert) => `[${alert.severity}] ${alert.region} · ${alert.title} · ${alert.state} ${alert.time} · ${alert.impact || alert.detail} · ${alert.confidence || frame.confidence}% confidence`).join('   ✦   ');
+  const tickerAlerts = [...api.alerts, ...ruleAlerts(frame)].filter((alert) => alert.state !== 'Forecast' || state.frame >= 7);
+  $('#ticker-text').textContent = tickerAlerts.map((alert) => `[${alert.severity}] ${alert.region} · ${alert.title} · ${alert.state} ${alert.time} · ${alert.impact || alert.detail} · ${alert.confidence || frame.confidence}% confidence`).join('   ✦   ') || 'No actionable telecom alerts in this frame';
   $('#broadcast-now').textContent = `${frame.observed ? 'Observed' : 'Forecast'} · ${frame.time} IRST · ${frame.state.toUpperCase()}`;
   $('#broadcast-next').textContent = `${frame.utilization > 78 ? 'Peak pressure' : 'Demand building'} · ${api.frames[Math.min(state.frame + 1, api.frames.length - 1)].time} IRST`;
   $('#broadcast-risk').textContent = frame.state === 'storm' ? 'East outage risk · Airport maintenance' : 'East interference · North congestion watch';
-  $('#confidence').textContent = `Confidence ${frame.confidence}%`; $('#source-state').textContent = frame.observed ? 'Observed frame' : (frame.state === 'storm' ? 'Forecast · severe' : 'Forecast frame');
+  $('#confidence').textContent = `Confidence ${frame.confidence}%`; $('#source-state').textContent = `Demo telemetry · ${frame.observed ? 'Observed scenario' : 'Forecast scenario'}`;
+  $('#broadcast-source').textContent = state.irimoStatus === 'live' ? 'Demo telemetry · IRIMO live' : `Demo telemetry · IRIMO ${state.irimoStatus}`;
   $('#selected-time').textContent = `${frame.time} IRST`; $('#selected-state').textContent = frame.observed ? 'Observed condition' : 'Forecast condition'; $('#timeline-confidence').textContent = `Confidence ${frame.confidence}%`;
-  $('#timeline').value = state.frame; renderSites(frame); renderWeatherCards(frame); renderKpis(frame); renderAlerts(frame); renderDetails(frame); renderStories();
+  $('#timeline').value = state.frame; renderSites(frame); renderWeatherCards(frame); renderKpis(frame); renderOperations(frame); renderAlerts(frame); renderDetails(frame); renderStories();
   $('#map-hud-time').textContent = `${frame.time} IRST · ${frame.observed ? 'Observed' : 'Forecast'}`;
   $('#map-hud-layer').textContent = `${state.layer[0].toUpperCase()}${state.layer.slice(1)}`;
   $('#map-hud-warnings').textContent = state.irimoWarnings.length ? `${state.irimoWarnings.length} IRIMO warnings` : 'IRIMO feed loading';
   const wind = frame.state === 'storm' ? ['SW', 32] : frame.state === 'rain' ? ['W', 24] : frame.state === 'cloud' ? ['NW', 17] : ['N', 11];
   ensureBroadcastWeather(); $('#map-hud-wind').textContent = `Wind ${wind[0]} ${wind[1]} km/h`;
   $('#map-canvas').dataset.weather = frame.state;
+}
+
+function renderOperations(frame) {
+  const rows = api.provinceProfiles.map((profile) => api.getProvinceMetrics(profile.name, state.frame));
+  const riskScore = (row) => Math.round(row.congestion * 0.58 + Math.max(0, 98 - row.coverage) * 4 + row.incidents * 10 + row.packetLoss * 4);
+  const ranked = rows.map((row) => ({ ...row, riskScore: riskScore(row) })).sort((a, b) => b.riskScore - a.riskScore);
+  const critical = ranked.filter((row) => row.riskScore >= 82).length;
+  const watch = ranked.filter((row) => row.riskScore >= 65 && row.riskScore < 82).length;
+  const healthy = Math.max(0, ranked.length - critical - watch);
+  const sourceState = frame.observed ? 'observed' : 'forecast';
+  $('#ops-mode').textContent = `${sourceState.toUpperCase()} · DEMO TELEMETRY`;
+  $('#ops-summary').innerHTML = [
+    ['Capacity review', `${critical + watch}`, critical ? 'Immediate review' : 'Within plan', critical ? 'critical' : 'healthy'],
+    ['Critical provinces', `${critical}`, critical ? 'Escalate first' : 'None detected', critical ? 'critical' : 'healthy'],
+    ['Watch provinces', `${watch}`, 'Monitor next frame', watch ? 'watch' : 'healthy'],
+    ['Coverage floor', `${Math.min(...ranked.map((row) => row.coverage)).toFixed(1)}%`, 'Lowest province', 'watch'],
+    ['Data quality', sourceState === 'observed' ? 'Complete' : 'Forecast', frame.observed ? 'Fresh demo frame' : 'Labelled forecast', frame.observed ? 'healthy' : 'watch'],
+  ].map(([label, value, detail, stateName]) => `<div class="ops-stat ${stateName}"><span>${label}</span><strong>${value}</strong><small>${detail}</small></div>`).join('');
+  $('#ops-watchlist').innerHTML = ranked.slice(0, 6).map((row) => {
+    const status = row.riskScore >= 82 ? 'critical' : row.riskScore >= 65 ? 'watch' : 'healthy';
+    return `<tr class="${status}"><td><strong>${row.name}</strong><small>${row.technology}${row.maintenance !== 'No window' ? ` · ${row.maintenance}` : ''}</small></td><td>${row.trafficGbps} <small>Gbps</small></td><td><b>${row.congestion}%</b><div class="ops-meter"><i style="width:${row.congestion}%"></i></div></td><td>${row.coverage.toFixed(1)}%</td><td><span class="ops-status ${status}">${status === 'critical' ? 'REVIEW' : status === 'watch' ? 'WATCH' : 'OK'}</span></td></tr>`;
+  }).join('');
+  $('#ops-sources-list').innerHTML = Object.values(api.operations).map((source) => `<div class="ops-source"><span class="ops-source-dot ${source.state}"></span><div><strong>${source.label}</strong><small>${source.value} · ${source.detail}</small></div><em>${source.state === 'live' ? 'SOURCE' : source.state.toUpperCase()}</em></div>`).join('');
 }
 function narrative(frame) {
   if (frame.state === 'storm') return `Severe network weather is expected across the metro by ${frame.time}. Utilization reaches ${frame.utilization}%, latency rises to ${frame.latency} milliseconds, and ${frame.incidents} active incidents need attention. Confidence is ${frame.confidence}%.`;
@@ -120,7 +147,8 @@ function narrative(frame) {
   return `Good afternoon. Network conditions across Tehran are mostly clear. Availability is ${frame.availability}%, while demand is at ${frame.utilization}% and beginning to rise toward the evening peak.`;
 }
 function renderSites(frame) {
-  const layer = $('#site-layer'); layer.innerHTML = ''; layer.style.transform = `translate(${state.mapX}px, ${state.mapY}px) scale(${state.mapZoom})`; layer.style.transformOrigin = '50% 50%'; layer.style.opacity = state.layer === 'warnings' ? '.12' : state.layer === 'condition' ? '.28' : '1';
+  $('#zoom-reset').textContent = `${Math.round(state.mapZoom * 100)}%`;
+  const layer = $('#site-layer'); layer.innerHTML = ''; applyMapTransform(); layer.style.opacity = state.layer === 'warnings' ? '.12' : state.layer === 'condition' ? '.28' : '1';
   api.regions.forEach((region, index) => {
     const site = document.createElement('button');
     const severity = state.layer === 'traffic' || state.layer === 'congestion' ? (frame.utilization > 84 ? 'storm' : frame.utilization > 70 ? 'rain' : region.state)
@@ -135,6 +163,12 @@ function renderSites(frame) {
     site.setAttribute('aria-label', site.title); site.innerHTML = `<span></span><b>${region.sites}</b>`; site.addEventListener('click', () => selectRegion(region)); layer.append(site);
   });
   renderIrimoWarningMarkers(); $('#map-layer-label').textContent = `${state.layer[0].toUpperCase()}${state.layer.slice(1)} layer`;
+}
+function applyMapTransform() {
+  const transform = `translate(${state.mapX}px, ${state.mapY}px) scale(${state.mapZoom})`;
+  ['#site-layer', '#weather-layer', '.iran-map', '#broadcast-weather-layer'].forEach((selector) => {
+    const node = $(selector); if (!node) return; node.style.transform = transform; node.style.transformOrigin = '50% 50%';
+  });
 }
 function renderIrimoWarningMarkers() {
   const layer = $('#warning-layer'); if (!layer) return;
@@ -185,6 +219,7 @@ function renderMapLegend() {
 }
 function renderWeatherCards(frame) {
   const layer = $('#weather-layer'); if (!layer || !mapProjection || !provinceAnchors.length) return;
+  ensureProvinceSelector();
   const severityRank = { yellow:1, orange:2, red:3 }; const warningsByProvince = new Map();
   state.irimoWarnings.forEach((warning) => {
     const provinces = [...(warning.location?.provinces || []).map((province) => province.name), ...(warning.location?.cities || []).map((city) => city.province)];
@@ -206,7 +241,7 @@ function renderWeatherCards(frame) {
     placed.push(candidate);
     const leader = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     leader.innerHTML = `<line x1="${province.x}" y1="${province.y}" x2="${candidate.x}" y2="${candidate.y}"/><circle cx="${province.x}" cy="${province.y}" r="2.2"/>`; leaders.append(leader);
-    const warningLevel = province.warning?.level; const card = document.createElement(province.warning ? 'button' : 'div');
+    const warningLevel = province.warning?.level; const card = document.createElement('button');
     card.className = `province-weather ${weatherState} layer-${state.layer}${warningLevel ? ` has-warning warning-${warningLevel}` : ''}`;
     card.style.left = `${candidate.x / 760 * 100}%`; card.style.top = `${candidate.y / 500 * 100}%`;
     const shortName = province.name.replace('East Azerbaijan','E Azerbaijan').replace('West Azerbaijan','W Azerbaijan').replace('Razavi Khorasan','Razavi Khor.').replace('North Khorasan','N Khorasan').replace('South Khorasan','S Khorasan').replace('Sistan and Baluchestan','Sistan').replace('Chaharmahal and Bakhtiari','Chaharmahal').replace('Kohgiluyeh and Boyer-Ahmad','Kohgiluyeh');
@@ -215,7 +250,7 @@ function renderWeatherCards(frame) {
     const glyph = state.layer === 'condition' ? weatherIcon(display.condition) : '<i class="metric-glyph" aria-hidden="true"></i>';
     const showWarningBadge = warningLevel && state.layer === 'warnings';
     card.innerHTML = `<span class="province-weather-main"><b>${escapeHtml(display.value)}</b><span class="province-weather-icon">${glyph}</span></span><small>${escapeHtml(shortName)}</small>${showWarningBadge ? `<em aria-hidden="true">!</em>` : ''}`;
-    if (province.warning) card.addEventListener('click', () => { document.querySelector(`[data-irimo-card="${CSS.escape(province.warning.id)}"]`)?.scrollIntoView({ behavior:'smooth', block:'nearest' }); document.querySelectorAll('.irimo-warning').forEach((item) => item.classList.toggle('selected', item.dataset.irimoCard === province.warning.id)); });
+    card.addEventListener('click', () => { state.selectedProvince = province.name; renderDetails(frame); document.querySelectorAll('.province-shape').forEach((path) => path.classList.toggle('selected-province', provinceKey(path.dataset.province) === provinceKey(province.name))); if (province.warning) { document.querySelector(`[data-irimo-card="${CSS.escape(province.warning.id)}"]`)?.scrollIntoView({ behavior:'smooth', block:'nearest' }); document.querySelectorAll('.irimo-warning').forEach((item) => item.classList.toggle('selected', item.dataset.irimoCard === province.warning.id)); } });
     const provincePath = [...document.querySelectorAll('.province-shape')].find((path) => provinceKey(path.dataset.province) === provinceKey(province.name));
     provincePath?.classList.add(`wx-${weatherState}`); if (warningLevel) provincePath?.classList.add(`warning-${warningLevel}`);
     layer.append(card);
@@ -235,13 +270,32 @@ $('#play-btn').addEventListener('click', () => { state.playing = !state.playing;
 function tick() { if (!state.playing) return; state.frame = state.frame >= api.frames.length - 1 ? 0 : state.frame + 1; render(); setTimeout(tick, 1300 / state.speed); }
 $('#speed-select').addEventListener('change', (event) => { state.speed = Number(event.target.value); }); $('#now-btn').addEventListener('click', () => { state.frame = 6; render(); }); $('#fullscreen-btn').addEventListener('click', async () => { if (document.fullscreenElement) await document.exitFullscreen(); else if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); });
 $('#prev-btn').addEventListener('click', () => { state.frame = Math.max(state.frame - 1, 0); render(); });
-$('#plus-hour-btn').addEventListener('click', () => { state.frame = Math.min(state.frame + 1, api.frames.length - 1); render(); }); $('#presenter-btn').addEventListener('click', () => document.body.classList.toggle('presenter-mode')); $('#motion-btn').addEventListener('click', () => { state.reducedMotion = !state.reducedMotion; $('#motion-btn').textContent = state.reducedMotion ? 'Enable motion' : 'Reduce motion'; render(); });
+$('#plus-hour-btn').addEventListener('click', () => { state.frame = Math.min(state.frame + 1, api.frames.length - 1); render(); });
 $('#next-btn').addEventListener('click', () => { state.frame = Math.min(state.frame + 1, api.frames.length - 1); render(); });
 $('#tonight-btn').addEventListener('click', () => { state.frame = 9; render(); }); $('#tomorrow-btn').addEventListener('click', () => { state.frame = 12; render(); });
-$('#presenter-btn').addEventListener('click', () => document.body.classList.toggle('presenter-mode')); $('#motion-btn').addEventListener('click', () => { state.reducedMotion = !state.reducedMotion; $('#motion-btn').textContent = state.reducedMotion ? 'Enable motion' : 'Reduce motion'; render(); });
+$('#presenter-btn').addEventListener('click', () => { const enabled = document.body.classList.toggle('presenter-mode'); $('#presenter-btn').textContent = enabled ? 'Exit presenter' : 'Presenter mode'; $('#presenter-btn').setAttribute('aria-pressed', String(enabled)); }); $('#motion-btn').addEventListener('click', () => { state.reducedMotion = !state.reducedMotion; $('#motion-btn').textContent = state.reducedMotion ? 'Enable motion' : 'Reduce motion'; $('#motion-btn').setAttribute('aria-pressed', String(state.reducedMotion)); render(); });
 document.querySelectorAll('[data-layer]').forEach((button) => button.addEventListener('click', () => { document.querySelectorAll('[data-layer]').forEach((item) => item.classList.remove('active')); button.classList.add('active'); state.layer = button.dataset.layer; render(); }));
 $('#audience-select').addEventListener('change', (event) => { state.audience = event.target.value; renderDetails(api.getFrame(state.frame)); }); $('#next-story').addEventListener('click', () => { state.story = (state.story + 1) % stories.length; render(); }); $('#zoom-in').addEventListener('click', () => { state.mapZoom = Math.min(1.8, Number((state.mapZoom + 0.2).toFixed(1))); renderSites(api.getFrame(state.frame)); }); $('#zoom-out').addEventListener('click', () => { state.mapZoom = Math.max(1, Number((state.mapZoom - 0.2).toFixed(1))); renderSites(api.getFrame(state.frame)); }); $('#zoom-reset').addEventListener('click', () => { state.mapZoom = 1; renderSites(api.getFrame(state.frame)); }); const pan = (x, y) => { state.mapX += x; state.mapY += y; renderSites(api.getFrame(state.frame)); }; $('#pan-left').addEventListener('click', () => pan(-20, 0)); $('#pan-right').addEventListener('click', () => pan(20, 0)); $('#pan-up').addEventListener('click', () => pan(0, -20)); $('#pan-down').addEventListener('click', () => pan(0, 20)); $('#reset-map').addEventListener('click', () => { state.selectedRegion = null; state.mapZoom = 1; state.mapX = 0; state.mapY = 0; render(); });
 render();
+
+// Keep demo provenance visible in the KPI and province drill-down surfaces.
+function renderKpis(frame) {
+  const items = [['availability','Availability',`${frame.availability}%`,'+0.4%','good'],['utilization','Utilization',`${frame.utilization}%`,frame.utilization > 78 ? 'Peak pressure' : 'Within plan',frame.utilization > 78 ? 'warn' : 'good'],['latency','Latency',`${frame.latency} ms`,frame.latency > 45 ? 'Rising' : 'Stable',frame.latency > 45 ? 'warn' : 'good'],['throughput','Throughput',`${frame.throughput} Mbps`,'Across metro','good'],['loss','Packet loss',`${frame.loss}%`,frame.loss > 1.5 ? 'Degraded' : 'Nominal',frame.loss > 1.5 ? 'bad' : 'good'],['signal','Signal quality',`${frame.signal}/100`,frame.signal < 75 ? 'Watch edge' : 'Healthy',frame.signal < 75 ? 'warn' : 'good'],['incidents','Active incidents',String(frame.incidents),frame.incidents ? 'Needs review' : 'All clear',frame.incidents ? 'warn' : 'good']];
+  $('#kpi-grid').innerHTML = items.map(([key,label,value,trend,kind]) => `<button class="kpi-card" data-kpi="${key}" aria-label="Focus ${label}; demo scenario ${frame.observed ? 'observed' : 'forecast'}"><span>${label}</span><strong>${value}</strong><small class="${kind}">${trend}</small><em>Demo scenario · ${frame.observed ? 'observed' : 'forecast'} frame</em><div class="spark ${kind}"><i></i><i></i><i></i><i></i><i></i><i></i></div></button>`).join('');
+  document.querySelectorAll('[data-kpi]').forEach((card) => card.addEventListener('click', () => { state.layer = card.dataset.kpi === 'latency' ? 'latency' : card.dataset.kpi === 'utilization' ? 'traffic' : card.dataset.kpi === 'incidents' ? 'incidents' : 'condition'; document.querySelectorAll('[data-layer]').forEach((item) => item.classList.toggle('active', item.dataset.layer === state.layer)); renderSites(frame); renderWeatherCards(frame); }));
+}
+
+function renderDetails(frame) {
+  const region = state.selectedRegion || { name:state.selectedProvince || 'Metro overview', sites:12 };
+  const audience = state.audience;
+  const body = audience === 'engineering'
+    ? `<div class="detail-stat"><span>Radio quality</span><strong>${frame.signal}/100 · demo SINR proxy</strong></div><div class="detail-stat"><span>RSRP / RSRQ</span><strong>-92 dBm / -11 dB · demo proxy</strong></div><div class="detail-stat"><span>Interference</span><strong>${frame.state === 'storm' ? 'Severe · E-04/E-05' : 'Nominal'}</strong></div><div class="detail-stat"><span>Handovers</span><strong>${frame.utilization > 78 ? 'Watch north-east edge' : 'Stable across metro'}</strong></div><div class="detail-stat"><span>Backhaul</span><strong>${frame.latency > 50 ? 'Capacity pressure' : 'Nominal · demo 99.97%'}</strong></div>`
+    : audience === 'noc'
+      ? `<div class="detail-stat"><span>Operational status</span><strong>${frame.incidents ? `${frame.incidents} demo incidents in scope` : 'All systems nominal'}</strong></div><div class="detail-stat"><span>Freshness</span><strong>Demo scenario · ${frame.observed ? 'observed' : 'forecast'} frame</strong></div><div class="detail-stat"><span>Top action</span><strong>${frame.state === 'storm' ? 'Escalate severe conditions' : 'Monitor forecast edge'}</strong></div>`
+      : `<div class="detail-stat"><span>Customer impact</span><strong>${frame.state === 'storm' ? 'High in east and north · illustrative' : frame.state === 'rain' ? 'Moderate in east · illustrative' : 'Low / contained · illustrative'}</strong></div><div class="detail-stat"><span>Network outlook</span><strong>${frame.state === 'clear' ? 'Healthy through midday' : 'Pressure rising into peak'}</strong></div><div class="detail-stat"><span>Coverage</span><strong>${region.sites || 12} demo site clusters reporting</strong></div>`;
+  $('#detail-title').textContent = region.name;
+  $('#detail-content').innerHTML = `${body}<div class="detail-stat"><span>Selected time</span><strong>${frame.time} IRST · ${frame.observed ? 'observed' : 'forecast'} demo frame</strong></div>`;
+}
 function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[character])); }
 async function loadIrimoWarnings() {
   const list = $('#irimo-live-list'); const status = $('#irimo-feed-status');
@@ -250,9 +304,13 @@ async function loadIrimoWarnings() {
     if (!response.ok) throw new Error(`IRIMO API returned ${response.status}`);
     const payload = await response.json();
     state.irimoWarnings = payload.warnings || [];
+    state.irimoStatus = payload.status || 'fallback';
     $('#map-hud-warnings').textContent = `${state.irimoWarnings.length} IRIMO warnings`;
+    $('#map-scope').textContent = `Iran · 31 provinces · demo telemetry · IRIMO ${state.irimoStatus} · 12 site clusters`;
     const mode = payload.status === 'live' ? 'LIVE' : payload.status === 'stale' ? 'STALE' : 'FALLBACK';
-    status.textContent = `${mode} · ${payload.warnings.length} official warnings`;
+    const fetched = payload.fetchedAt ? new Date(payload.fetchedAt).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }) : 'time unavailable';
+    status.textContent = `${mode} · ${payload.warnings.length} bulletins · fetched ${fetched}`;
+    $('#broadcast-source').textContent = `Demo telemetry · IRIMO ${payload.status || 'fallback'}`;
     if (!payload.warnings.length) {
       list.innerHTML = '<div class="irimo-empty">IRIMO returned no normalized warnings. The telecom impact cards below remain available.</div>';
       return;
@@ -260,6 +318,9 @@ async function loadIrimoWarnings() {
     list.innerHTML = payload.warnings.slice(0, 6).map((warning) => { const area = warning.location?.affectedArea || 'Location details unavailable'; const locations = warning.location?.locations?.length || 0; return `<article class="irimo-warning irimo-${escapeHtml(warning.level)}" data-irimo-card="${escapeHtml(warning.id)}"><div><b>${escapeHtml(warning.levelFa)} · ${escapeHtml(warning.level.toUpperCase())}</b><strong>${escapeHtml(warning.title)}</strong><small>${warning.date ? `Date ${escapeHtml(warning.date)} · ` : ''}${locations} mapped location${locations === 1 ? '' : 's'} · Official IRIMO warning</small><em>${escapeHtml(area)}</em></div><a class="irimo-warning-link" href="${escapeHtml(warning.url)}" target="_blank" rel="noreferrer">Open ↗</a></article>`; }).join('');
     renderIrimoWarningMarkers();
   } catch (error) {
+    state.irimoStatus = 'unavailable';
+    $('#map-scope').textContent = 'Iran · 31 provinces · demo telemetry · IRIMO unavailable · 12 site clusters';
+    $('#broadcast-source').textContent = 'Demo telemetry · IRIMO unavailable';
     status.textContent = 'ERROR · source unavailable';
     list.innerHTML = '<div class="irimo-empty">IRIMO feed unavailable. Telecom impact cards remain visible as illustrative platform data.</div>';
     console.warn('IRIMO warning feed unavailable', error);
@@ -275,9 +336,9 @@ function ruleAlerts(frame) {
   return generated;
 }
 function renderKpis(frame) {
-  const quality = (key) => key === 'throughput' && frame.time === '11:00' ? { state:'stale', label:'Stale · last known' } : key === 'signal' && frame.time === '21:00' ? { state:'stale', label:'Stale · degraded feed' } : key === 'incidents' && frame.time === '00:00' ? { state:'na', label:'Not applicable' } : { state:'healthy', label:frame.observed ? '42 seconds ago' : 'Forecast frame' };
+  const quality = (key) => key === 'throughput' && frame.time === '11:00' ? { state:'stale', label:'Stale · last known' } : key === 'signal' && frame.time === '21:00' ? { state:'stale', label:'Stale · degraded feed' } : key === 'incidents' && frame.time === '00:00' ? { state:'na', label:'Not applicable' } : { state:'healthy', label:frame.observed ? 'Demo scenario · observed' : 'Demo scenario · forecast' };
   const items = [['availability','Availability',frame.availability + '%','+0.4%','good'],['utilization','Utilization',frame.utilization + '%',frame.utilization > 78 ? 'Peak pressure' : 'Within plan',frame.utilization > 78 ? 'warn' : 'good'],['latency','Latency',frame.latency + ' ms',frame.latency > 45 ? 'Rising' : 'Stable',frame.latency > 45 ? 'warn' : 'good'],['throughput','Throughput',frame.throughput + ' Mbps','Across metro','good'],['loss','Packet loss',frame.loss + '%',frame.loss > 1.5 ? 'Degraded' : 'Nominal',frame.loss > 1.5 ? 'bad' : 'good'],['signal','Signal quality',frame.signal + '/100',frame.signal < 75 ? 'Watch edge' : 'Healthy',frame.signal < 75 ? 'warn' : 'good'],['incidents','Active incidents',String(frame.incidents),frame.incidents ? 'Needs review' : 'All clear',frame.incidents ? 'warn' : 'good']];
-  $('#kpi-grid').innerHTML = items.map(([key,label,value,trend,kind]) => { const meta = quality(key); const displayValue = meta.state === 'na' ? '—' : value; const statusClass = meta.state === 'healthy' ? kind : 'data-quality-' + meta.state; return '<button class="kpi-card data-' + meta.state + '" data-kpi="' + key + '" aria-label="Focus ' + label + '; ' + meta.label + '"><span>' + label + '</span><strong>' + displayValue + '</strong><small class="' + statusClass + '">' + (meta.state === 'healthy' ? trend : meta.label) + '</small><em>' + (meta.state === 'healthy' ? (frame.observed ? '42 seconds ago' : 'Forecast frame') : 'Data quality flag') + '</em><div class="spark ' + kind + '"><i></i><i></i><i></i><i></i><i></i><i></i></div></button>'; }).join('');
+  $('#kpi-grid').innerHTML = items.map(([key,label,value,trend,kind]) => { const meta = quality(key); const displayValue = meta.state === 'na' ? '—' : value; const statusClass = meta.state === 'healthy' ? kind : 'data-quality-' + meta.state; return '<button class="kpi-card data-' + meta.state + '" data-kpi="' + key + '" aria-label="Focus ' + label + '; ' + meta.label + '"><span>' + label + '</span><strong>' + displayValue + '</strong><small class="' + statusClass + '">' + (meta.state === 'healthy' ? trend : meta.label) + '</small><em>' + (meta.state === 'healthy' ? `Demo scenario · ${frame.observed ? 'observed' : 'forecast'} frame` : 'Data quality flag') + '</em><div class="spark ' + kind + '"><i></i><i></i><i></i><i></i><i></i><i></i></div></button>'; }).join('');
   document.querySelectorAll('[data-kpi]').forEach((card) => card.addEventListener('click', () => { state.layer = card.dataset.kpi === 'latency' ? 'latency' : card.dataset.kpi === 'utilization' ? 'traffic' : card.dataset.kpi === 'incidents' ? 'incidents' : 'condition'; document.querySelectorAll('[data-layer]').forEach((item) => item.classList.toggle('active', item.dataset.layer === state.layer)); renderSites(frame); }));
 }
 function renderAlerts(frame) {
@@ -289,3 +350,51 @@ function renderAlerts(frame) {
   document.querySelectorAll('.alert-ack').forEach((button) => button.addEventListener('click', (event) => { event.stopPropagation(); const key = button.dataset.ackGroup; if (state.acknowledgedAlerts.has(key)) state.acknowledgedAlerts.delete(key); else state.acknowledgedAlerts.add(key); renderAlerts(frame); }));
 }
 render();
+
+function ensureProvinceSelector() {
+  if ($('#province-select') || !provinceAnchors.length) return;
+  const source = $('#map-source');
+  if (!source?.parentElement) return;
+  const select = document.createElement('select');
+  select.id = 'province-select';
+  select.setAttribute('aria-label', 'Find an Iran province');
+  select.innerHTML = '<option value="">Find province…</option>' + provinceAnchors.map((province) => `<option value="${escapeHtml(province.name)}">${escapeHtml(province.name)}</option>`).join('');
+  source.parentElement.insertBefore(select, source);
+  select.addEventListener('change', () => {
+    if (!select.value) return;
+    state.selectedProvince = select.value;
+    document.querySelectorAll('.province-shape').forEach((path) => path.classList.toggle('selected-province', provinceKey(path.dataset.province) === provinceKey(select.value)));
+    renderDetails(api.getFrame(state.frame));
+  });
+}
+function persistAcknowledgements() {
+  try { localStorage.setItem('network-weather-acknowledged', JSON.stringify([...state.acknowledgedAlerts])); } catch { /* demo persistence is optional */ }
+}
+document.addEventListener('click', (event) => { if (event.target.closest('.alert-ack')) setTimeout(persistAcknowledgements, 0); });
+function ensureAlertFilters() {
+  if ($('#alert-severity-filter')) return;
+  const list = $('#alert-list');
+  const filters = document.createElement('div');
+  filters.className = 'alert-filters';
+  filters.setAttribute('aria-label', 'Operational alert filters');
+  filters.innerHTML = '<label>Severity <select id="alert-severity-filter"><option value="all">All</option><option value="critical">Critical</option><option value="severe">Severe</option><option value="warning">Warning</option></select></label><label>State <select id="alert-state-filter"><option value="all">All</option><option value="Observed">Observed</option><option value="Forecast">Forecast</option><option value="Planned">Planned</option></select></label>';
+  list.parentElement.insertBefore(filters, list);
+  filters.querySelectorAll('select').forEach((select) => select.addEventListener('change', () => renderAlerts(api.getFrame(state.frame))));
+}
+function renderAlerts(frame) {
+  ensureAlertFilters();
+  const severity = $('#alert-severity-filter').value;
+  const alertState = $('#alert-state-filter').value;
+  const active = [...api.alerts, ...ruleAlerts(frame)].filter((alert) => (alert.state !== 'Forecast' || state.frame >= 7) && (severity === 'all' || alert.severity === severity) && (alertState === 'all' || alert.state === alertState));
+  const groups = [...active.reduce((map, alert) => { const key = alert.groupId || alert.id; const group = map.get(key) || []; group.push(alert); map.set(key, group); return map; }, new Map()).values()];
+  $('#alert-count').textContent = `${groups.length} shown · ${active.length} signals`;
+  $('#alert-list').innerHTML = groups.map((group) => { const alert = group[0]; const key = alert.groupId || alert.id; const acknowledged = state.acknowledgedAlerts.has(key); return '<div class="alert-group ' + (acknowledged ? 'acknowledged' : '') + '"><button class="alert-row ' + alert.severity + '" data-region="' + alert.region + '" data-time="' + alert.time + '"><span class="alert-icon">' + alert.icon + '</span><span><strong>' + alert.title + (group.length > 1 ? ' · ' + group.length + ' signals grouped' : '') + '</strong><small>' + group.map((item) => item.detail).join(' · ') + ' · ' + (alert.impact || 'Operational impact') + ' · ' + (alert.confidence || frame.confidence) + '% confidence</small></span><em>' + alert.time + '<br>' + (acknowledged ? 'Acknowledged' : alert.state) + '</em></button><button class="alert-ack" data-ack-group="' + key + '">' + (acknowledged ? 'Restore' : 'Acknowledge') + '</button></div>'; }).join('') || '<div class="irimo-empty">No alerts match the current filters.</div>';
+  document.querySelectorAll('.alert-row').forEach((row) => row.addEventListener('click', () => { const region = api.regions.find((item) => item.id === row.dataset.region); const target = api.frames.findIndex((item) => item.time === row.dataset.time); if (target >= 0) state.frame = target; if (region) selectRegion(region); render(); }));
+  document.querySelectorAll('.alert-ack').forEach((button) => button.addEventListener('click', (event) => { event.stopPropagation(); const key = button.dataset.ackGroup; if (state.acknowledgedAlerts.has(key)) state.acknowledgedAlerts.delete(key); else state.acknowledgedAlerts.add(key); renderAlerts(frame); }));
+}
+// Final definition intentionally lives after legacy helpers so the active renderer is unambiguous.
+function renderKpis(frame) {
+  const items = [['availability','Availability',`${frame.availability}%`,'+0.4%','good'],['utilization','Utilization',`${frame.utilization}%`,frame.utilization > 78 ? 'Peak pressure' : 'Within plan',frame.utilization > 78 ? 'warn' : 'good'],['latency','Latency',`${frame.latency} ms`,frame.latency > 45 ? 'Rising' : 'Stable',frame.latency > 45 ? 'warn' : 'good'],['throughput','Throughput',`${frame.throughput} Mbps`,'Across metro','good'],['loss','Packet loss',`${frame.loss}%`,frame.loss > 1.5 ? 'Degraded' : 'Nominal',frame.loss > 1.5 ? 'bad' : 'good'],['signal','Signal quality',`${frame.signal}/100`,frame.signal < 75 ? 'Watch edge' : 'Healthy',frame.signal < 75 ? 'warn' : 'good'],['incidents','Active incidents',String(frame.incidents),frame.incidents ? 'Needs review' : 'All clear',frame.incidents ? 'warn' : 'good']];
+  $('#kpi-grid').innerHTML = items.map(([key,label,value,trend,kind]) => `<button class="kpi-card" data-kpi="${key}" aria-label="Focus ${label}; demo scenario ${frame.observed ? 'observed' : 'forecast'}"><span>${label}</span><strong>${value}</strong><small class="${kind}">${trend}</small><em>Demo scenario · ${frame.observed ? 'observed' : 'forecast'} frame</em><div class="spark ${kind}"><i></i><i></i><i></i><i></i><i></i><i></i></div></button>`).join('');
+  document.querySelectorAll('[data-kpi]').forEach((card) => card.addEventListener('click', () => { state.layer = card.dataset.kpi === 'latency' ? 'latency' : card.dataset.kpi === 'utilization' ? 'traffic' : card.dataset.kpi === 'incidents' ? 'incidents' : 'condition'; document.querySelectorAll('[data-layer]').forEach((item) => item.classList.toggle('active', item.dataset.layer === state.layer)); renderSites(frame); renderWeatherCards(frame); }));
+}

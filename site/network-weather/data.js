@@ -39,5 +39,11 @@ window.NetworkWeatherApi = (() => {
     { id:'a5', severity:'severe', weatherLevel:'orange', weatherLevelFa:'هشدار نارنجی', icon:'⚡', title:'West backhaul interference', detail:'Microwave link quality reduced on the western gateway', region:'west', time:'18:00', state:'Forecast' },
     { id:'a6', groupId:'airport-maintenance', severity:'warning', weatherLevel:'yellow', weatherLevelFa:'هشدار زرد', icon:'♨', title:'Airport power resilience watch', detail:'Backup power test overlaps with maintenance window', region:'airport', time:'21:00', state:'Planned' },
   ];
-  return { schemaVersion, regions, frames, alerts, provinceProfiles, getProvinceMetrics, getFrame(index) { return frames[Math.max(0, Math.min(index, frames.length - 1))]; } };
+  const operations = {
+    telemetry: { label: 'Network telemetry', value: 'Demo fixture', detail: 'Replace with NMS/OSS adapter', state: 'demo' },
+    geography: { label: 'Iran geography', value: '31 provinces', detail: 'OSM-derived GeoJSON', state: 'ready' },
+    weather: { label: 'IRIMO warnings', value: 'Official feed', detail: 'Province/city parsing enabled', state: 'live' },
+    pipeline: { label: 'Data pipeline', value: 'Presentation mode', detail: 'No live ingestion connector', state: 'demo' },
+  };
+  return { schemaVersion, regions, frames, alerts, provinceProfiles, operations, getProvinceMetrics, getFrame(index) { return frames[Math.max(0, Math.min(index, frames.length - 1))]; } };
 })();
