@@ -300,14 +300,34 @@ function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, (cha
 async function loadIrimoWarnings() {
   const list = $('#irimo-live-list'); const status = $('#irimo-feed-status');
   try {
-    const response = await fetch('/api/network-weather/warnings');
+    const response = await fetch('/api/network-weather/warnings', { cache: 'no-store' });
     if (!response.ok) throw new Error(`IRIMO API returned ${response.status}`);
-    const payload = await response.json();
+    renderIrimoPayload(await response.json());
+    return;
+  } catch (error) {
+    try {
+      const snapshotResponse = await fetch('./data/irimo-warnings.json', { cache: 'no-store' });
+      if (!snapshotResponse.ok) throw new Error(`IRIMO snapshot returned ${snapshotResponse.status}`);
+      const snapshot = await snapshotResponse.json();
+      renderIrimoPayload({ ...snapshot, status: snapshot.status === 'live' ? 'snapshot' : snapshot.status });
+      return;
+    } catch (snapshotError) {
+      state.irimoStatus = 'unavailable';
+      $('#map-scope').textContent = 'Iran · 31 provinces · demo telemetry · IRIMO unavailable · 12 site clusters';
+      $('#broadcast-source').textContent = 'Demo telemetry · IRIMO unavailable';
+      status.textContent = 'ERROR · source unavailable';
+      list.innerHTML = '<div class="irimo-empty">IRIMO feed unavailable. Telecom impact cards remain visible as illustrative platform data.</div>';
+      console.warn('IRIMO warning feed unavailable', error, snapshotError);
+    }
+  }
+}
+function renderIrimoPayload(payload) {
+    const list = $('#irimo-live-list'); const status = $('#irimo-feed-status');
     state.irimoWarnings = payload.warnings || [];
     state.irimoStatus = payload.status || 'fallback';
     $('#map-hud-warnings').textContent = `${state.irimoWarnings.length} IRIMO warnings`;
     $('#map-scope').textContent = `Iran · 31 provinces · demo telemetry · IRIMO ${state.irimoStatus} · 12 site clusters`;
-    const mode = payload.status === 'live' ? 'LIVE' : payload.status === 'stale' ? 'STALE' : 'FALLBACK';
+    const mode = payload.status === 'live' ? 'LIVE' : payload.status === 'snapshot' ? 'SNAPSHOT' : payload.status === 'stale' ? 'STALE' : 'FALLBACK';
     const fetched = payload.fetchedAt ? new Date(payload.fetchedAt).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }) : 'time unavailable';
     status.textContent = `${mode} · ${payload.warnings.length} bulletins · fetched ${fetched}`;
     $('#broadcast-source').textContent = `Demo telemetry · IRIMO ${payload.status || 'fallback'}`;
@@ -317,14 +337,6 @@ async function loadIrimoWarnings() {
     }
     list.innerHTML = payload.warnings.slice(0, 6).map((warning) => { const area = warning.location?.affectedArea || 'Location details unavailable'; const locations = warning.location?.locations?.length || 0; return `<article class="irimo-warning irimo-${escapeHtml(warning.level)}" data-irimo-card="${escapeHtml(warning.id)}"><div><b>${escapeHtml(warning.levelFa)} · ${escapeHtml(warning.level.toUpperCase())}</b><strong>${escapeHtml(warning.title)}</strong><small>${warning.date ? `Date ${escapeHtml(warning.date)} · ` : ''}${locations} mapped location${locations === 1 ? '' : 's'} · Official IRIMO warning</small><em>${escapeHtml(area)}</em></div><a class="irimo-warning-link" href="${escapeHtml(warning.url)}" target="_blank" rel="noreferrer">Open ↗</a></article>`; }).join('');
     renderIrimoWarningMarkers();
-  } catch (error) {
-    state.irimoStatus = 'unavailable';
-    $('#map-scope').textContent = 'Iran · 31 provinces · demo telemetry · IRIMO unavailable · 12 site clusters';
-    $('#broadcast-source').textContent = 'Demo telemetry · IRIMO unavailable';
-    status.textContent = 'ERROR · source unavailable';
-    list.innerHTML = '<div class="irimo-empty">IRIMO feed unavailable. Telecom impact cards remain visible as illustrative platform data.</div>';
-    console.warn('IRIMO warning feed unavailable', error);
-  }
 }
 loadIrimoWarnings();
 loadIranBoundary();

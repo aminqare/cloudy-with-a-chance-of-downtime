@@ -1,0 +1,37 @@
+name: Refresh IRIMO warning snapshot
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: irimo-refresh
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Fetch IRIMO warnings
+        run: node scripts/update-irimo-snapshot.mjs
+
+      - name: Commit refreshed snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site/network-weather/data/irimo-warnings.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Refresh IRIMO warning snapshot"
+          git push
