@@ -1,0 +1,15 @@
+/* No-purple carrier mode: blue/cyan handles technology, red handles incidents, yellow handles warnings. */
+:root{--mci-magenta:#4d8dff;--magenta:#4d8dff}
+body{background:radial-gradient(circle at 12% -18%,rgba(55,218,209,.16),transparent 30%),radial-gradient(circle at 92% 8%,rgba(77,141,255,.14),transparent 28%),linear-gradient(145deg,#020817 0%,#061125 54%,#030912 100%)}
+.brand-mark{background:linear-gradient(135deg,var(--huawei-red),var(--blue) 58%,var(--fiber-cyan));box-shadow:0 0 26px rgba(255,62,97,.28),0 0 36px rgba(77,141,255,.16)}
+.ticker-bar{background:linear-gradient(90deg,rgba(255,62,97,.95),rgba(77,141,255,.94) 52%,rgba(55,218,209,.9))}
+.broadcast-crawl{border-left-color:var(--blue)}
+.condition-badge{background:linear-gradient(135deg,rgba(55,218,209,.15),rgba(77,141,255,.12))}
+.condition-badge.rain,.alert-row.info .alert-icon{color:var(--blue);border-color:rgba(77,141,255,.42)}
+.route-lines path:nth-child(3){stroke:rgba(77,141,255,.34)}
+.map-canvas[data-layer="technology"] .weather-radar-field{background:radial-gradient(circle at 68% 38%,rgba(77,141,255,.32),transparent 30%),linear-gradient(135deg,rgba(8,70,105,.52),rgba(19,49,92,.42))}
+.iran-ridge{stroke:rgba(77,141,255,.3)}
+.alert-panel,.operations-panel{border-top-color:rgba(77,141,255,.54)}
+.timeline-wrap input{accent-color:var(--blue)}
+.timeline-segments .future{background:linear-gradient(90deg,var(--fiber-cyan),var(--blue))}
+.story-row.active{background:linear-gradient(90deg,rgba(55,218,209,.12),rgba(77,141,255,.1))}
