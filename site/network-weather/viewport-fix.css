@@ -19,6 +19,27 @@ main { min-width: 0; }
 .weather-consensus span { color: #5e625a; }
 .weather-consensus.is-warning { border-left-color: #d82f3f; }
 .weather-consensus.is-clear { border-left-color: #007a58; }
+.live-station-card { position: absolute; z-index: 6; display: grid; gap: 2px; width: 92px; padding: 7px 8px; transform: translate(-50%, -50%); border: 1px solid rgba(0,122,88,.42); border-radius: 5px; background: rgba(255,250,240,.94); color: #20231e; box-shadow: 3px 4px 0 rgba(0,0,0,.16), 0 0 0 2px rgba(255,250,240,.18); text-align: left; cursor: pointer; }
+.live-station-card:hover, .live-station-card:focus-visible { z-index: 12; transform: translate(-50%, -50%) scale(1.08); outline: 2px solid #d89a00; }
+.live-station-head { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
+.live-station-head b { overflow: hidden; font-size: 8px; letter-spacing: .06em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.live-station-head i { display: grid; flex: 0 0 16px; width: 16px; height: 16px; overflow: hidden; color: #007a58; }
+.live-station-head svg, .live-station-head svg path, .live-station-head svg circle { display: block !important; width: 16px !important; height: 16px !important; overflow: hidden; fill: none !important; stroke: currentColor !important; }
+.map-canvas .province-weather-icon svg, .map-canvas .province-weather-icon svg path, .map-canvas .province-weather-icon svg circle { fill: none !important; stroke: currentColor !important; }
+.live-station-card strong { font-size: 19px; line-height: 1; }
+.live-station-card small { color: #5e625a; font-size: 8px; font-weight: 800; white-space: nowrap; }
+.live-station-card.live-rain { border-color: #c46b18; }
+.live-station-card.live-rain .live-station-head i { color: #c46b18; }
+.live-station-card.live-storm { border-color: #b22a3d; }
+.live-station-card.live-storm .live-station-head i { color: #b22a3d; }
+.live-station-card.live-snow { border-color: #8d6b2d; }
+@media (max-width: 760px) {
+  .live-station-card { width: 72px; padding: 5px 6px; }
+  .live-station-head b { font-size: 6px; }
+  .live-station-card strong { font-size: 15px; }
+  .live-station-card small { font-size: 6px; }
+  .live-station-head i, .live-station-head svg { width: 13px; height: 13px; }
+}
 
 @media (max-width: 1100px) {
   .broadcast-grid { grid-template-columns: 1fr; }

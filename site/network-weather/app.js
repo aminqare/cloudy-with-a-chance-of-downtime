@@ -85,7 +85,7 @@ async function loadIranBoundary() {
     ]);
     if (!boundaryResponse.ok || !citiesResponse.ok) throw new Error('Iran geography assets unavailable');
     const [boundary, cities] = await Promise.all([boundaryResponse.json(), citiesResponse.json()]);
-    projectIranBoundary(boundary); cityLabels.length = 0; cityLabels.push(...cities); renderWeatherCards(api.getFrame(state.frame)); renderIrimoWarningMarkers();
+    projectIranBoundary(boundary); cityLabels.length = 0; cityLabels.push(...cities); renderWeatherCards(api.getFrame(state.frame)); renderLiveStations(); renderIrimoWarningMarkers();
   } catch (error) {
     $('#map-source').textContent = `Boundary: fallback · ${error.message}`;
     console.warn('Iran boundary asset unavailable; using fallback outline.', error);
@@ -111,7 +111,8 @@ function render() {
   const weatherLabel = state.weatherStatus === 'live' ? `${weatherSource} live wind` : `${weatherSource} ${state.weatherStatus}`;
   $('#broadcast-source').textContent = state.irimoStatus === 'live' ? `IRIMO live · ${weatherLabel}` : `IRIMO ${state.irimoStatus} · ${weatherLabel}`;
   $('#selected-time').textContent = `${frame.time} IRST`; $('#selected-state').textContent = frame.observed ? 'Observed condition' : 'Forecast condition'; $('#timeline-confidence').textContent = `Confidence ${frame.confidence}%`;
-  $('#timeline').value = state.frame; renderSites(frame); renderWeatherCards(frame); renderKpis(frame); renderOperations(frame); renderAlerts(frame); renderDetails(frame); renderStories();
+  const mapKicker = document.querySelector('.map-hud-kicker'); if (mapKicker) mapKicker.innerHTML = `<i></i> ${state.weatherStatus === 'live' || state.weatherStatus === 'snapshot' ? 'Live provider conditions' : 'Demo operations scenario'}`;
+  $('#timeline').value = state.frame; renderSites(frame); renderWeatherCards(frame); renderLiveStations(); renderKpis(frame); renderOperations(frame); renderAlerts(frame); renderDetails(frame); renderStories();
   $('#map-hud-time').textContent = `${frame.time} IRST · ${frame.observed ? 'Observed' : 'Forecast'}`;
   $('#map-hud-layer').textContent = `${state.layer[0].toUpperCase()}${state.layer.slice(1)}`;
   $('#map-hud-warnings').textContent = state.irimoWarnings.length ? `${state.irimoWarnings.length} IRIMO warnings` : 'IRIMO feed loading';
@@ -177,7 +178,7 @@ function renderSites(frame) {
 }
 function applyMapTransform() {
   const transform = `translate(${state.mapX}px, ${state.mapY}px) scale(${state.mapZoom})`;
-  ['#site-layer', '#weather-layer', '.iran-map', '#broadcast-weather-layer'].forEach((selector) => {
+  ['#site-layer', '#weather-layer', '#live-station-layer', '.iran-map', '#broadcast-weather-layer'].forEach((selector) => {
     const node = $(selector); if (!node) return; node.style.transform = transform; node.style.transformOrigin = '50% 50%';
   });
 }
@@ -266,6 +267,25 @@ function renderWeatherCards(frame) {
     provincePath?.classList.add(`wx-${weatherState}`); if (warningLevel) provincePath?.classList.add(`warning-${warningLevel}`);
     layer.append(card);
   });
+}
+function liveConditionIcon(condition) {
+  return weatherIcon(condition === 'storm' ? 'stormy' : condition === 'rain' ? 'rainy' : condition === 'cloud' ? 'partly' : 'sunny');
+}
+function renderLiveStations() {
+  const layer = $('#live-station-layer');
+  if (!layer || !mapProjection) return;
+  const stations = state.weatherConditions?.stations || [];
+  if (!stations.length) { layer.innerHTML = ''; return; }
+  layer.innerHTML = stations.map((station) => {
+    const [x, y] = mapProjection([station.lon, station.lat]);
+    const condition = station.weatherCondition || 'clear';
+    const agreement = station.agreement?.condition;
+    const agreementLabel = agreement?.total > 1 ? `${agreement.votes}/${agreement.total} agree` : 'live';
+    const temp = station.temperatureC == null ? '—' : `${Math.round(station.temperatureC)}°`;
+    const wind = station.windKmh == null ? '—' : `${station.windDirection || 'N'} ${Math.round(station.windKmh)}`;
+    return `<button class="live-station-card live-${escapeHtml(condition)}" style="left:${x / 760 * 100}%;top:${y / 500 * 100}%" title="${escapeHtml(station.name)} · ${temp} · wind ${escapeHtml(wind)} km/h · ${escapeHtml(agreementLabel)}" aria-label="${escapeHtml(station.name)} live weather: ${temp}, wind ${escapeHtml(wind)} kilometres per hour, ${escapeHtml(agreementLabel)}"><span class="live-station-head"><b>${escapeHtml(station.name)}</b><i>${liveConditionIcon(condition)}</i></span><strong>${escapeHtml(temp)}</strong><small>${escapeHtml(wind)} km/h · ${escapeHtml(agreementLabel)}</small></button>`;
+  }).join('');
+  applyMapTransform();
 }
 function renderKpisLegacy(frame) {
   const items = [['availability','Availability',`${frame.availability}%`,'+0.4%','good','42 seconds ago'],['utilization','Utilization',`${frame.utilization}%`,frame.utilization > 78 ? 'Peak pressure' : 'Within plan',frame.utilization > 78 ? 'warn' : 'good',frame.observed ? '42 seconds ago' : 'Forecast'],['latency','Latency',`${frame.latency} ms`,frame.latency > 45 ? 'Rising' : 'Stable',frame.latency > 45 ? 'warn' : 'good',frame.observed ? '42 seconds ago' : 'Forecast'],['throughput','Throughput',`${frame.throughput} Mbps`,'Across metro','good',frame.observed ? '42 seconds ago' : 'Forecast'],['loss','Packet loss',`${frame.loss}%`,frame.loss > 1.5 ? 'Degraded' : 'Nominal',frame.loss > 1.5 ? 'bad' : 'good',frame.observed ? '42 seconds ago' : 'Forecast'],['signal','Signal quality',`${frame.signal}/100`,frame.signal < 75 ? 'Watch edge' : 'Healthy',frame.signal < 75 ? 'warn' : 'good',frame.observed ? '42 seconds ago' : 'Forecast'],['incidents','Active incidents',`${frame.incidents}`,frame.incidents ? 'Needs review' : 'All clear',frame.incidents ? 'warn' : 'good',frame.observed ? '42 seconds ago' : 'Forecast']];
