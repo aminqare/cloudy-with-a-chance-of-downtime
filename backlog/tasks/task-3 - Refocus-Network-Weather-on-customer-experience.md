@@ -1,11 +1,11 @@
 ---
 id: TASK-3
 title: Refocus Network Weather on customer experience
-status: In Progress
+status: Done
 assignee:
   - Codex
 created_date: '2026-10-17 06:37'
-updated_date: '2026-10-17 06:44'
+updated_date: '2026-10-17 07:16'
 labels:
   - network-weather
   - customer-experience
@@ -14,12 +14,14 @@ dependencies: []
 references:
   - 'https://aminqare.github.io/cloudy-with-a-chance-of-downtime/'
 modified_files:
-  - site/network-weather/index.html
-  - site/network-weather/customer-experience.css
-  - site/network-weather/customer-experience-data.js
-  - site/network-weather/customer-experience.js
-  - scripts/verify-network-weather-mvp.mjs
   - README.md
+  - scripts/verify-network-weather-a11y.mjs
+  - scripts/verify-network-weather-mvp.mjs
+  - site/network-weather/app.js
+  - site/network-weather/index.html
+  - site/network-weather/customer-experience-data.js
+  - site/network-weather/customer-experience.css
+  - site/network-weather/customer-experience.js
 priority: high
 type: enhancement
 ordinal: 2180
@@ -33,13 +35,13 @@ The current national command-center presentation exposes internal transport, cor
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The primary navigation and map present live weather and customer experience as the main product story.
-- [ ] #2 LDP-derived RRC and TRP mock data is translated into understandable demand, speed, and service-quality language while retaining an optional technical detail view.
-- [ ] #3 TX topology, core, EHS, exact site identifiers, and internal command-center workflows are absent from the customer-facing journey.
-- [ ] #4 Provider-backed weather, observed wind stations, IRIMO warnings, and snapshot fallback behavior continue to work.
-- [ ] #5 The page is responsive at desktop and mobile widths and introduces no horizontal overflow.
-- [ ] #6 The README and automated verifier describe and validate the customer-facing scope.
-- [ ] #7 The updated static site is published to the existing GitHub Pages deployment.
+- [x] #1 The primary navigation and map present live weather and customer experience as the main product story.
+- [x] #2 LDP-derived RRC and TRP mock data is translated into understandable demand, speed, and service-quality language while retaining an optional technical detail view.
+- [x] #3 TX topology, core, EHS, exact site identifiers, and internal command-center workflows are absent from the customer-facing journey.
+- [x] #4 Provider-backed weather, observed wind stations, IRIMO warnings, and snapshot fallback behavior continue to work.
+- [x] #5 The page is responsive at desktop and mobile widths and introduces no horizontal overflow.
+- [x] #6 The README and automated verifier describe and validate the customer-facing scope.
+- [x] #7 The updated static site is published to the existing GitHub Pages deployment.
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -62,3 +64,13 @@ Preserved the live weather pipeline. Browser QA observed 6 provider-backed wind 
 
 Validation passed: JavaScript syntax checks, npm run verify:network-weather-mvp, git diff --check, desktop visual QA, 375px mobile visual QA, and zero horizontal overflow. Browser console contained no warnings or errors.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Refocused Network Weather from an internal multi-domain command center into a customer-facing weather and service-experience forecast. The public journey now centers on provider-backed weather, IRIMO warnings, and four clear map views: live weather, customer experience, demand, and speed. LDP-inspired RRC/TRP demonstration data is translated into regional service language and retained as optional progressive technical detail; TX topology, core, EHS, exact site IDs, and command-center workflows are no longer loaded into the primary experience.
+
+Updated the README and verification scripts for the new scope, and corrected legacy duplicate renderer declarations in app.js so syntax validation is reliable. Verification passed with JavaScript syntax checks, the full network-weather MVP suite, git diff checks, desktop and 375px mobile visual QA, zero horizontal overflow, 8 rendered regional markers, 6 provider-backed weather stations, 20 IRIMO snapshot bulletins on GitHub Pages, and no browser console warnings or errors.
+
+Published to GitHub Pages from commit 2ae45c8.
+<!-- SECTION:FINAL_SUMMARY:END -->
