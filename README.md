@@ -2,7 +2,7 @@
 
 > **Tonight’s forecast:** 91% utilization, scattered packet loss, and a strong chance someone asks, “Is it the network?”
 
-**Cloudy with a Chance of Downtime** turns telecom operations into a live TV weather broadcast. Instead of temperatures and rain clouds, it forecasts congestion, latency, outages, maintenance windows, and customer impact across Iran.
+**Cloudy with a Chance of Downtime** is a national telecom command center disguised as a live TV weather broadcast. It fuses radio capacity, subscribers, transmission topology, core resources, EHS readiness, incidents and real weather into one management view across Iran.
 
 The result is a presenter-friendly dashboard that lets a NOC team explain network conditions like a weather anchor explains an approaching storm.
 
@@ -15,6 +15,12 @@ The result is a presenter-friendly dashboard that lets a NOC team explain networ
 ## What’s on the radar?
 
 - 🗺️ **Iran operations map** with all 31 provinces and major cities
+- 🧠 **Executive fusion queue** correlating radio, transport, core, subscribers, EHS and weather into recommended actions
+- 📶 **LDP-modeled RRC/TRP views** for FDD, TDD and 5G occupancy, allocation pressure and throughput
+- 🕸️ **TxTopoli-modeled transport views** for fiber/microwave links, protection, capacity, alarms, distance and loss
+- 🧬 **MonRes-modeled CTO views** for Core PS, Core CS, IP, wireless/IMS, CPU, licenses, trunks and subscriber capacity
+- 🦺 **EHS-modeled readiness views** for incidents, audits, PPE and corrective actions
+- 🎯 **360° site digital twin** joining location, radio, subscribers, TX path, core dependency, EHS and weather exposure
 - 🌦️ **Broadcast weather graphics** with animated fronts, radar cells, wind vectors, and provincial conditions
 - 📡 **Telecom layers** for traffic, congestion, latency, coverage, incidents, maintenance, and technology
 - ⚠️ **IRIMO warning integration** that parses official warnings and maps affected provinces
@@ -54,7 +60,16 @@ flowchart LR
     G --> H
 ```
 
-The MVP uses deterministic telecom fixture data so every presentation tells the same story. IRIMO weather warnings are fetched and parsed separately, then associated with provinces and cities when location names are available. Live wind and condition data is corroborated through Open-Meteo, with optional OpenWeatherMap and WeatherAPI.com adapters.
+The public demo uses deterministic, sanitized mock telecom data modeled on the schemas and operating concepts of the local LDP, TxTopoli, MonRes and EHS platforms. It does not copy or publish their production records. IRIMO weather warnings are fetched and parsed separately, then associated with provinces and cities when location names are available. Live wind and condition data is corroborated through Open-Meteo, with optional OpenWeatherMap and WeatherAPI.com adapters.
+
+| Command-center domain | Design source | Public demo state |
+| --- | --- | --- |
+| RRC, TRP and capacity allocations | LDP PW dashboard contract | Sanitized mock |
+| Equipment and TX topology | TxTopoli inventory/topology contract | Sanitized mock |
+| Core PS, Core CS, IP and wireless resources | MonRes CTO report contract | Sanitized mock |
+| Incidents, audits, PPE and training | EHS operational contract | Sanitized mock |
+| Weather conditions and wind | Open-Meteo + configured weather providers | Provider-backed snapshot |
+| Official warnings | IRIMO | Official parsed snapshot |
 
 ### Weather source consensus
 
@@ -67,7 +82,7 @@ The server keeps provider credentials private and aggregates provider votes befo
 
 Copy `.env.example` into the server environment and add the optional provider keys when available. Never put those keys in browser JavaScript or GitHub Pages assets.
 
-No production NMS/OSS connector or customer telemetry is included.
+No production NMS/OSS connector, real subscriber record, private topology record or production site coordinate is included in the public repository.
 
 ## Map layers
 

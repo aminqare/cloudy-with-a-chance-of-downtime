@@ -4,10 +4,10 @@ const urlFrame = Number(new URLSearchParams(window.location.search).get('frame')
 const state = { frame: Number.isInteger(urlFrame) && urlFrame >= 0 && urlFrame < 13 ? urlFrame : 6, playing: false, speed: 1, layer: 'condition', audience: 'executive', reducedMotion: false, story: 0, mapZoom: 1, mapX: 0, mapY: 0, acknowledgedAlerts: new Set(), irimoWarnings: [], irimoStatus: 'loading', weatherConditions: null, weatherStatus: 'loading', selectedProvince: null };
 try { state.acknowledgedAlerts = new Set(JSON.parse(localStorage.getItem('network-weather-acknowledged') || '[]')); } catch { state.acknowledgedAlerts = new Set(); }
 const conditions = {
-  clear: { label:'CLEAR', weather:'sunny', title:'Mostly clear network conditions', detail:'Strong availability across the metro with isolated pressure building toward the evening peak.', className:'clear' },
-  cloud: { label:'PARTLY CLOUDY', weather:'partly', title:'Partly cloudy network conditions', detail:'Demand is rising across key corridors. Capacity remains healthy with localized congestion risk.', className:'cloud' },
-  rain: { label:'CONGESTION RAIN', weather:'rainy', title:'Congestion developing in the east', detail:'Traffic pressure is spreading into the evening peak. Prepare for a measurable latency increase.', className:'rain' },
-  storm: { label:'SEVERE STORM', weather:'stormy', title:'Severe network weather', detail:'High utilization, elevated latency, and multiple incidents require immediate operational attention.', className:'storm' },
+  clear: { label:'CLEAR', weather:'sunny', title:'National network conditions stable', detail:'Radio, transport, core and subscriber impact remain controlled with isolated pressure building toward the evening peak.', className:'clear' },
+  cloud: { label:'PARTLY CLOUDY', weather:'partly', title:'Cross-domain pressure is building', detail:'RRC demand and transport utilization are rising across key corridors while core capacity remains available.', className:'cloud' },
+  rain: { label:'CONGESTION RAIN', weather:'rainy', title:'Service pressure is spreading east', detail:'Traffic, RRC occupancy and subscriber exposure are increasing. Prepare transport and core capacity actions.', className:'rain' },
+  storm: { label:'SEVERE STORM', weather:'stormy', title:'National command escalation', detail:'Correlated radio, transport, core, subscriber and safety signals require immediate management attention.', className:'storm' },
 };
 const stories = [
   ['Today','What is happening now?','Explain the overall condition and the top KPI drivers.'],
@@ -175,7 +175,7 @@ function renderSites(frame) {
 }
 function applyMapTransform() {
   const transform = `translate(${state.mapX}px, ${state.mapY}px) scale(${state.mapZoom})`;
-  ['#site-layer', '#weather-layer', '#live-station-layer', '.iran-map', '#broadcast-weather-layer'].forEach((selector) => {
+  ['#site-layer', '#weather-layer', '#live-station-layer', '#fusion-site-layer', '#fusion-link-layer', '.iran-map', '#broadcast-weather-layer'].forEach((selector) => {
     const node = $(selector); if (!node) return; node.style.transform = transform; node.style.transformOrigin = '50% 50%';
   });
 }
