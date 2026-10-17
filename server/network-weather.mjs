@@ -97,8 +97,15 @@ async function fetchOpenWeather() {
   const results = await Promise.all(weatherStations.map(async (station) => {
     const url = new URL("https://api.openweathermap.org/data/3.0/onecall");
     url.searchParams.set("lat", station.lat); url.searchParams.set("lon", station.lon); url.searchParams.set("appid", key); url.searchParams.set("units", "metric"); url.searchParams.set("exclude", "minutely,daily");
-    const raw = await fetchJson(url);
-    return { ...station, temperatureC: raw.current?.temp ?? null, humidity: raw.current?.humidity ?? null, weatherCode: raw.current?.weather?.[0]?.id ?? null, weatherCondition: openWeatherCondition(raw.current?.weather?.[0]?.id), windKmh: raw.current?.wind_speed == null ? null : raw.current.wind_speed * 3.6, windGustKmh: raw.current?.wind_gust == null ? null : raw.current.wind_gust * 3.6, windDirection: windCompass(raw.current?.wind_deg), observedAt: raw.current?.dt ? new Date(raw.current.dt * 1000).toISOString() : null, alertsActive: Boolean(raw.alerts?.length) };
+    try {
+      const raw = await fetchJson(url);
+      return { ...station, temperatureC: raw.current?.temp ?? null, humidity: raw.current?.humidity ?? null, weatherCode: raw.current?.weather?.[0]?.id ?? null, weatherCondition: openWeatherCondition(raw.current?.weather?.[0]?.id), windKmh: raw.current?.wind_speed == null ? null : raw.current.wind_speed * 3.6, windGustKmh: raw.current?.wind_gust == null ? null : raw.current.wind_gust * 3.6, windDirection: windCompass(raw.current?.wind_deg), observedAt: raw.current?.dt ? new Date(raw.current.dt * 1000).toISOString() : null, alertsActive: Boolean(raw.alerts?.length), alertsSupported: true };
+    } catch (oneCallError) {
+      const fallback = new URL("https://api.openweathermap.org/data/2.5/weather");
+      fallback.searchParams.set("lat", station.lat); fallback.searchParams.set("lon", station.lon); fallback.searchParams.set("appid", key); fallback.searchParams.set("units", "metric");
+      const raw = await fetchJson(fallback);
+      return { ...station, temperatureC: raw.main?.temp ?? null, humidity: raw.main?.humidity ?? null, weatherCode: raw.weather?.[0]?.id ?? null, weatherCondition: openWeatherCondition(raw.weather?.[0]?.id), windKmh: raw.wind?.speed == null ? null : raw.wind.speed * 3.6, windGustKmh: raw.wind?.gust == null ? null : raw.wind.gust * 3.6, windDirection: windCompass(raw.wind?.deg), observedAt: raw.dt ? new Date(raw.dt * 1000).toISOString() : null, alertsActive: null, alertsSupported: false, note: `One Call unavailable (${oneCallError.message}); current weather fallback active.` };
+    }
   }));
   return results;
 }
@@ -140,11 +147,11 @@ export async function fetchWeatherConditions({ force = false } = {}) {
   try { irimo = await fetchIrimoWarnings(); } catch { /* the warning endpoint already returns a safe fallback */ }
   const warningVotes = [
     { provider: "IRIMO", state: irimo.warnings?.length ? "warning" : "clear", detail: "official bulletin" },
-    ...results.filter((result) => result.provider !== "Open-Meteo").map((result) => { const hasAlert = result.stations.some((station) => station.alertsActive); return { provider: result.provider, state: result.state === "live" ? (hasAlert ? "warning" : "clear") : "unavailable", detail: result.error || "alerts endpoint" }; }),
+    ...results.filter((result) => result.provider !== "Open-Meteo").map((result) => { const alertStations = result.stations.filter((station) => station.alertsSupported !== false); const hasAlert = alertStations.some((station) => station.alertsActive); return { provider: result.provider, state: result.state !== "live" ? "unavailable" : alertStations.length ? (hasAlert ? "warning" : "clear") : "unsupported", detail: result.error || (alertStations.length ? "alerts endpoint" : "current conditions only") }; }),
   ];
   const availableWarningVotes = warningVotes.filter((vote) => ["warning", "clear"].includes(vote.state));
   const warningActive = availableWarningVotes.filter((vote) => vote.state === "warning").length >= Math.ceil(availableWarningVotes.length / 2);
-  const data = { status: liveResults.length ? "live" : "fallback", fetchedAt: new Date().toISOString(), source: { provider: liveResults.map((result) => result.provider).join(" + ") || "No live weather source", url: "https://open-meteo.com/en/docs" }, sources: results.map(({ provider, state, error }) => ({ provider, state, error: error || null })), stations, warningConsensus: { active: warningActive, votes: availableWarningVotes.filter((vote) => vote.state === "warning").map((vote) => vote.provider), clearVotes: availableWarningVotes.filter((vote) => vote.state === "clear").map((vote) => vote.provider), unavailable: warningVotes.filter((vote) => vote.state === "unavailable").map((vote) => vote.provider), unsupported: ["Open-Meteo"], totalAvailable: availableWarningVotes.length } };
+  const data = { status: liveResults.length ? "live" : "fallback", fetchedAt: new Date().toISOString(), source: { provider: liveResults.map((result) => result.provider).join(" + ") || "No live weather source", url: "https://open-meteo.com/en/docs" }, sources: results.map(({ provider, state, error, stations: sourceStations }) => ({ provider, state, error: error || sourceStations.find((station) => station.note)?.note || null })), stations, warningConsensus: { active: warningActive, votes: availableWarningVotes.filter((vote) => vote.state === "warning").map((vote) => vote.provider), clearVotes: availableWarningVotes.filter((vote) => vote.state === "clear").map((vote) => vote.provider), unavailable: warningVotes.filter((vote) => vote.state === "unavailable").map((vote) => vote.provider), unsupported: warningVotes.filter((vote) => vote.state === "unsupported" || vote.state === "not-configured-warning-check").map((vote) => vote.provider), totalAvailable: availableWarningVotes.length } };
   if (liveResults.length) weatherConditionCache = { fetchedAt: Date.now(), data };
   return data;
 }
