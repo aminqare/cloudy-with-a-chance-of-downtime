@@ -310,6 +310,7 @@ function renderLiveStations() {
   layer.style.display = state.layer === 'condition' ? 'block' : 'none';
   const stations = state.weatherConditions?.stations || [];
   if (!stations.length) { layer.innerHTML = ''; return; }
+  const windBearings = { N:0, NNE:22.5, NE:45, ENE:67.5, E:90, ESE:112.5, SE:135, SSE:157.5, S:180, SSW:202.5, SW:225, WSW:247.5, W:270, WNW:292.5, NW:315, NNW:337.5 };
   layer.innerHTML = stations.map((station) => {
     const [x, y] = mapProjection([station.lon, station.lat]);
     const cardX = Math.max(58, Math.min(702, x)); const cardY = Math.max(92, Math.min(438, y));
@@ -318,7 +319,9 @@ function renderLiveStations() {
     const agreementLabel = agreement?.total > 1 ? `${agreement.votes}/${agreement.total} agree` : 'live';
     const temp = station.temperatureC == null ? '—' : `${Math.round(station.temperatureC)}°`;
     const wind = station.windKmh == null ? '—' : `${station.windDirection || 'N'} ${Math.round(station.windKmh)}`;
-    return `<button class="live-station-card live-${escapeHtml(condition)}" style="left:${cardX / 760 * 100}%;top:${cardY / 500 * 100}%" title="${escapeHtml(station.name)} · ${temp} · wind ${escapeHtml(wind)} km/h · ${escapeHtml(agreementLabel)}" aria-label="${escapeHtml(station.name)} live weather: ${temp}, wind ${escapeHtml(wind)} kilometres per hour, ${escapeHtml(agreementLabel)}"><span class="live-station-head"><b>${escapeHtml(station.name)}</b><i>${liveConditionIcon(condition)}</i></span><strong>${escapeHtml(temp)}</strong><small>${escapeHtml(wind)} km/h · ${escapeHtml(agreementLabel)}</small></button>`;
+    const fromBearing = windBearings[String(station.windDirection || '').toUpperCase()];
+    const windArrow = Number.isFinite(Number(station.windKmh)) && Number(station.windKmh) > 0.5 && fromBearing != null ? `<span class="wind-card-arrow" style="--wind-card-angle:${((fromBearing + 90) % 360).toFixed(1)}deg" aria-hidden="true"></span>` : '';
+    return `<button class="live-station-card live-${escapeHtml(condition)}" style="left:${cardX / 760 * 100}%;top:${cardY / 500 * 100}%" title="${escapeHtml(station.name)} · ${temp} · wind ${escapeHtml(wind)} km/h · ${escapeHtml(agreementLabel)}" aria-label="${escapeHtml(station.name)} live weather: ${temp}, wind ${escapeHtml(wind)} kilometres per hour, ${escapeHtml(agreementLabel)}"><span class="live-station-head"><b>${escapeHtml(station.name)}</b><span class="live-station-icons">${windArrow}<i>${liveConditionIcon(condition)}</i></span></span><strong>${escapeHtml(temp)}</strong><small>${escapeHtml(wind)} km/h · ${escapeHtml(agreementLabel)}</small></button>`;
   }).join('');
   applyMapTransform();
 }

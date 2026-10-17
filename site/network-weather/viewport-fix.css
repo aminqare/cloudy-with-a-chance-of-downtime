@@ -27,6 +27,11 @@ main { min-width: 0; }
 .live-station-card { position: absolute; z-index: 6; display: grid; gap: 2px; width: 92px; padding: 7px 8px; transform: translate(-50%, -50%); border: 1px solid rgba(0,122,88,.42); border-radius: 5px; background: rgba(255,250,240,.94); color: #20231e; box-shadow: 3px 4px 0 rgba(0,0,0,.16), 0 0 0 2px rgba(255,250,240,.18); text-align: left; cursor: pointer; transition: transform .32s cubic-bezier(.22,.61,.36,1), box-shadow .32s ease, border-color .32s ease; }
 .live-station-card:hover, .live-station-card:focus-visible { z-index: 12; transform: translate(-50%, -50%) scale(1.08); outline: 2px solid #d89a00; }
 .live-station-head { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
+.live-station-icons { display: flex; align-items: center; gap: 3px; }
+.wind-card-arrow { display: inline-block; width: 10px; height: 10px; position: relative; transform: rotate(var(--wind-card-angle)); color: #b22a3d; animation: windCardPulse 1.8s ease-in-out infinite; }
+.wind-card-arrow::before { content: ''; position: absolute; left: 1px; top: 4px; width: 8px; height: 2px; border-radius: 2px; background: currentColor; }
+.wind-card-arrow::after { content: ''; position: absolute; right: 0; top: 2px; width: 5px; height: 5px; border-top: 2px solid currentColor; border-right: 2px solid currentColor; transform: rotate(45deg); }
+@keyframes windCardPulse { 50% { opacity: .42; transform: rotate(var(--wind-card-angle)) scale(.78); } }
 .live-station-head b { overflow: hidden; font-size: 8px; letter-spacing: .06em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
 .live-station-head i { display: grid; flex: 0 0 16px; width: 16px; height: 16px; overflow: hidden; color: #007a58; }
 .live-station-head svg, .live-station-head svg path, .live-station-head svg circle { display: block !important; width: 16px !important; height: 16px !important; overflow: hidden; fill: none !important; stroke: currentColor !important; }
