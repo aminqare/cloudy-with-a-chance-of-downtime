@@ -55,10 +55,11 @@
 /* Broadcast weather graphics: real weather-map motion clipped inside Iran. */
 .broadcast-weather-layer{--wind-angle:90deg;--wind-duration:9s;--cell-duration:12s;--front-duration:12s;--drift-x:0px;--drift-y:12px;--drift-start-x:0px;--drift-start-y:-4px;--cell-mid:.56;--cell-peak:.88;position:absolute;z-index:3;left:10%;top:8%;width:80%;height:84%;overflow:visible;pointer-events:none;opacity:.8;transition:opacity .45s ease}
 .broadcast-weather-layer[data-intensity="clear"]{--cell-mid:.05;--cell-peak:.1}.broadcast-weather-layer[data-intensity="cloud"]{--cell-mid:.16;--cell-peak:.28}.broadcast-weather-layer[data-intensity="rain"]{--cell-mid:.42;--cell-peak:.67}.broadcast-weather-layer[data-intensity="storm"]{--cell-mid:.7;--cell-peak:.96}
+.broadcast-weather-layer[data-wind-stations]:not([data-wind-stations="0"]) .radar-cells,.broadcast-weather-layer[data-wind-stations]:not([data-wind-stations="0"]) .weather-front{display:none}
 .radar-cell{transform-box:fill-box;transform-origin:center;animation:weatherAdvection var(--cell-duration) linear infinite;fill:url(#radar-green);mix-blend-mode:screen;will-change:transform,opacity}
 .radar-cell.cell-east{animation-delay:-4s;fill:url(#radar-heavy)}.radar-cell.cell-south{animation-delay:-8s;opacity:.55}
 .weather-front{fill:none;stroke:rgba(217,248,255,.76);stroke-width:2.1;stroke-dasharray:4 10;stroke-linecap:round;filter:drop-shadow(0 0 4px rgba(113,209,236,.55));animation:weatherFront var(--front-duration) linear infinite;will-change:stroke-dashoffset}
-.wind-vectors{transform-box:view-box;transform-origin:center;transform:rotate(var(--wind-angle));transition:transform 1.2s cubic-bezier(.22,.61,.36,1);will-change:transform}
+.wind-vectors{pointer-events:none}.station-wind{transition:opacity .35s ease}.station-wind.wind-disputed{opacity:.56}
 .wind-vectors path{fill:none;vector-effect:non-scaling-stroke}.wind-base{stroke:rgba(255,250,240,.2);stroke-width:.7;stroke-linecap:round}.wind-flow{stroke:rgba(255,250,240,.88);stroke-width:2;stroke-linecap:round;stroke-dasharray:1 13;animation:windFlow var(--wind-duration) linear var(--stream-delay,0s) infinite;filter:drop-shadow(0 0 2px rgba(255,250,240,.5));will-change:stroke-dashoffset}
 .map-canvas[data-weather="clear"] .radar-cell{opacity:.08}.map-canvas[data-weather="clear"] .weather-front{opacity:.18}.map-canvas[data-weather="clear"] .wind-vectors{opacity:.42}
 .map-canvas[data-weather="cloud"] .radar-cell{opacity:.24}.map-canvas[data-weather="cloud"] .weather-front{opacity:.42}

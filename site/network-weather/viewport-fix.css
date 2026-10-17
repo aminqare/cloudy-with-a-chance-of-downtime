@@ -21,6 +21,7 @@ main { min-width: 0; }
 .weather-consensus.is-clear { border-left-color: #007a58; }
 .map-canvas .wind-vectors .wind-base { stroke: rgba(255,250,240,.16); stroke-width: .7; }
 .map-canvas .wind-vectors .wind-flow { stroke: rgba(255,250,240,.92); stroke-width: 2.2; }
+.legend-swatch.wind { width: 14px; height: 2px; border-radius: 2px; background: #fffaf0; box-shadow: 0 0 4px rgba(255,250,240,.55); }
 #live-station-layer { position: absolute; inset: 8% 10%; z-index: 6; pointer-events: none; }
 .live-station-card { pointer-events: auto; }
 .live-station-card { position: absolute; z-index: 6; display: grid; gap: 2px; width: 92px; padding: 7px 8px; transform: translate(-50%, -50%); border: 1px solid rgba(0,122,88,.42); border-radius: 5px; background: rgba(255,250,240,.94); color: #20231e; box-shadow: 3px 4px 0 rgba(0,0,0,.16), 0 0 0 2px rgba(255,250,240,.18); text-align: left; cursor: pointer; transition: transform .32s cubic-bezier(.22,.61,.36,1), box-shadow .32s ease, border-color .32s ease; }

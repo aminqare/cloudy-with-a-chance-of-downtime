@@ -85,7 +85,7 @@ async function loadIranBoundary() {
     ]);
     if (!boundaryResponse.ok || !citiesResponse.ok) throw new Error('Iran geography assets unavailable');
     const [boundary, cities] = await Promise.all([boundaryResponse.json(), citiesResponse.json()]);
-    projectIranBoundary(boundary); cityLabels.length = 0; cityLabels.push(...cities); renderWeatherCards(api.getFrame(state.frame)); renderLiveStations(); renderIrimoWarningMarkers();
+    projectIranBoundary(boundary); cityLabels.length = 0; cityLabels.push(...cities); renderWeatherCards(api.getFrame(state.frame)); renderLiveStations(); updateWeatherMotion(state.weatherConditions?.stations || [], api.getFrame(state.frame).state); renderIrimoWarningMarkers();
   } catch (error) {
     $('#map-source').textContent = `Boundary: fallback · ${error.message}`;
     console.warn('Iran boundary asset unavailable; using fallback outline.', error);
@@ -116,11 +116,8 @@ function render() {
   $('#map-hud-time').textContent = `${frame.time} IRST · ${frame.observed ? 'Observed' : 'Forecast'}`;
   $('#map-hud-layer').textContent = `${state.layer[0].toUpperCase()}${state.layer.slice(1)}`;
   $('#map-hud-warnings').textContent = state.irimoWarnings.length ? `${state.irimoWarnings.length} IRIMO warnings` : 'IRIMO feed loading';
-  const liveTehran = state.weatherConditions?.stations?.find((station) => station.id === 'tehran');
-  const wind = liveTehran?.windKmh != null
-    ? [liveTehran.windDirection, Math.round(liveTehran.windKmh), liveTehran.windGustKmh]
-    : frame.state === 'storm' ? ['SW', 32] : frame.state === 'rain' ? ['W', 24] : frame.state === 'cloud' ? ['NW', 17] : ['N', 11];
-  ensureBroadcastWeather(); updateWeatherMotion(wind[0], wind[1], frame.state); $('#map-hud-wind').textContent = `Wind ${wind[0]} ${wind[1]} km/h${wind[2] != null ? ` · gust ${Math.round(wind[2])}` : ''}`;
+  const windStations = (state.weatherConditions?.stations || []).filter((station) => station.windKmh != null && station.windDirection && station.lat != null && station.lon != null);
+  ensureBroadcastWeather(); updateWeatherMotion(windStations, frame.state); $('#map-hud-wind').textContent = windStations.length ? `Wind observations · ${windStations.length} stations` : 'Wind observations unavailable';
   $('#map-canvas').dataset.weather = frame.state;
 }
 
@@ -216,22 +213,30 @@ function weatherIcon(condition) {
   if (condition === 'partly') return `<svg ${common}><circle class="accent" cx="8" cy="8" r="3"/><path d="M7.5 17h8.2a4 4 0 0 0 .3-8 5.5 5.5 0 0 0-10.3 1.7A3.3 3.3 0 0 0 7.5 17Z"/></svg>`;
   return `<svg ${common}><circle cx="12" cy="12" r="4"/><path class="accent" d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg>`;
 }
-function updateWeatherMotion(direction = 'N', windKmh = 11, condition = 'clear') {
+function updateWeatherMotion(stations = [], condition = 'clear') {
   const layer = $('#broadcast-weather-layer'); if (!layer) return;
   const bearings = { N:0, NNE:22.5, NE:45, ENE:67.5, E:90, ESE:112.5, SE:135, SSE:157.5, S:180, SSW:202.5, SW:225, WSW:247.5, W:270, WNW:292.5, NW:315, NNW:337.5 };
-  const fromBearing = bearings[String(direction || 'N').toUpperCase()] ?? 0;
-  const travelAngle = (fromBearing + 90) % 360;
-  const speed = Math.max(0, Math.min(90, Number(windKmh) || 0));
+  const windLayer = layer.querySelector('.wind-vectors');
+  if (!windLayer) return;
+  const observed = stations.filter((station) => mapProjection && station.lat != null && station.lon != null && station.windKmh != null && bearings[String(station.windDirection || '').toUpperCase()] != null);
+  windLayer.innerHTML = observed.map((station, stationIndex) => {
+    const [x, y] = mapProjection([station.lon, station.lat]); const speed = Math.max(0, Math.min(90, Number(station.windKmh) || 0));
+    const travelAngle = (bearings[String(station.windDirection).toUpperCase()] + 90) % 360; const length = Math.max(28, Math.min(62, 27 + speed * 3));
+    const duration = Math.max(2.4, Math.min(8.5, 8.8 - speed * .22)); const agreement = station.agreement?.direction;
+    const confidenceClass = agreement?.total > 1 && agreement.votes < agreement.total ? ' wind-disputed' : '';
+    const paths = [-8, 0, 8].map((offset, pathIndex) => `<path class="wind-flow" style="--wind-duration:${duration.toFixed(2)}s;--stream-delay:-${(stationIndex * .47 + pathIndex * .82).toFixed(2)}s" d="M ${(-length / 2).toFixed(1)} ${offset} C ${(-length / 6).toFixed(1)} ${offset - 3}, ${(length / 6).toFixed(1)} ${offset + 3}, ${(length / 2).toFixed(1)} ${offset}"/>`).join('');
+    return `<g class="station-wind${confidenceClass}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${travelAngle})"><title>${escapeHtml(station.name)}: ${escapeHtml(station.windDirection)} ${Math.round(speed)} km/h</title><path class="wind-base" d="M ${(-length / 2).toFixed(1)} 0 L ${(length / 2).toFixed(1)} 0"/>${paths}</g>`;
+  }).join('');
+  const vectors = observed.map((station) => { const angle = ((bearings[String(station.windDirection).toUpperCase()] + 90) % 360) * Math.PI / 180; const speed = Number(station.windKmh) || 0; return [Math.cos(angle) * speed, Math.sin(angle) * speed]; });
+  const averageX = vectors.reduce((sum, vector) => sum + vector[0], 0) / Math.max(1, vectors.length); const averageY = vectors.reduce((sum, vector) => sum + vector[1], 0) / Math.max(1, vectors.length);
+  const speed = Math.hypot(averageX, averageY); const travelAngle = Math.atan2(averageY, averageX);
   const distance = Math.max(7, Math.min(30, 6 + speed * .55));
-  const radians = travelAngle * Math.PI / 180;
-  const driftX = Math.cos(radians) * distance; const driftY = Math.sin(radians) * distance;
-  layer.style.setProperty('--wind-angle', `${travelAngle}deg`);
-  layer.style.setProperty('--wind-duration', `${Math.max(2.4, Math.min(7.5, 7.8 - speed * .13)).toFixed(2)}s`);
+  const driftX = Math.cos(travelAngle) * distance; const driftY = Math.sin(travelAngle) * distance;
   layer.style.setProperty('--cell-duration', `${Math.max(6, Math.min(13, 14 - speed * .16)).toFixed(2)}s`);
   layer.style.setProperty('--front-duration', `${Math.max(5, Math.min(14, 15 - speed * .2)).toFixed(2)}s`);
   layer.style.setProperty('--drift-x', `${driftX.toFixed(1)}px`); layer.style.setProperty('--drift-y', `${driftY.toFixed(1)}px`);
   layer.style.setProperty('--drift-start-x', `${(-driftX * .35).toFixed(1)}px`); layer.style.setProperty('--drift-start-y', `${(-driftY * .35).toFixed(1)}px`);
-  layer.dataset.intensity = condition;
+  layer.dataset.intensity = condition; layer.dataset.windStations = String(observed.length);
 }
 function ensureBroadcastWeather() {
   if ($('#broadcast-weather-layer')) return;
@@ -239,14 +244,13 @@ function ensureBroadcastWeather() {
   $('#map-hud-warnings').before(windReadout);
   const layer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   layer.id = 'broadcast-weather-layer'; layer.setAttribute('class', 'broadcast-weather-layer'); layer.setAttribute('viewBox', '0 0 760 500'); layer.setAttribute('preserveAspectRatio', 'none'); layer.setAttribute('aria-hidden', 'true');
-  const streamPaths = ['M45 120 C170 82 270 152 400 112 S610 72 720 118','M35 185 C160 145 280 214 405 178 S610 140 730 184','M28 250 C160 212 275 278 400 246 S610 207 735 248','M40 315 C170 278 285 343 410 310 S610 274 725 314','M68 380 C190 343 300 408 420 376 S600 342 700 378'];
-  const streams = streamPaths.map((path, index) => `<path class="wind-base" d="${path}"/><path class="wind-flow" style="--stream-delay:-${(index * 1.13).toFixed(2)}s" d="${path}"/>`).join('');
-  layer.innerHTML = `<defs><clipPath id="iran-weather-clip"><path d="M106 148 146 126 181 132 209 112 255 119 281 100 325 112 358 96 402 111 436 105 472 127 505 132 534 157 572 175 594 207 581 233 603 261 592 292 614 317 596 349 561 354 541 384 503 391 477 421 438 411 405 435 370 423 343 403 309 414 280 392 244 397 220 369 184 356 168 322 141 301 151 270 128 237 145 208 123 181Z"/></clipPath><radialGradient id="radar-green"><stop offset="0" stop-color="#69e69e" stop-opacity=".72"/><stop offset=".55" stop-color="#2bcf9a" stop-opacity=".34"/><stop offset="1" stop-color="#2bcf9a" stop-opacity="0"/></radialGradient><radialGradient id="radar-heavy"><stop offset="0" stop-color="#ff6a65" stop-opacity=".8"/><stop offset=".3" stop-color="#ffcb55" stop-opacity=".64"/><stop offset=".68" stop-color="#43d29a" stop-opacity=".32"/><stop offset="1" stop-color="#43d29a" stop-opacity="0"/></radialGradient></defs><g clip-path="url(#iran-weather-clip)"><g class="radar-cells"><ellipse class="radar-cell cell-west" cx="205" cy="235" rx="112" ry="86"/><ellipse class="radar-cell cell-east" cx="520" cy="245" rx="128" ry="108"/><ellipse class="radar-cell cell-south" cx="390" cy="390" rx="105" ry="75"/></g><path class="weather-front" d="M125 330 C220 272 264 325 350 259 S503 240 605 167"/><g class="wind-vectors">${streams}</g></g>`;
+  layer.innerHTML = `<defs><clipPath id="iran-weather-clip"><path d="M106 148 146 126 181 132 209 112 255 119 281 100 325 112 358 96 402 111 436 105 472 127 505 132 534 157 572 175 594 207 581 233 603 261 592 292 614 317 596 349 561 354 541 384 503 391 477 421 438 411 405 435 370 423 343 403 309 414 280 392 244 397 220 369 184 356 168 322 141 301 151 270 128 237 145 208 123 181Z"/></clipPath><radialGradient id="radar-green"><stop offset="0" stop-color="#69e69e" stop-opacity=".72"/><stop offset=".55" stop-color="#2bcf9a" stop-opacity=".34"/><stop offset="1" stop-color="#2bcf9a" stop-opacity="0"/></radialGradient><radialGradient id="radar-heavy"><stop offset="0" stop-color="#ff6a65" stop-opacity=".8"/><stop offset=".3" stop-color="#ffcb55" stop-opacity=".64"/><stop offset=".68" stop-color="#43d29a" stop-opacity=".32"/><stop offset="1" stop-color="#43d29a" stop-opacity="0"/></radialGradient></defs><g clip-path="url(#iran-weather-clip)"><g class="radar-cells"><ellipse class="radar-cell cell-west" cx="205" cy="235" rx="112" ry="86"/><ellipse class="radar-cell cell-east" cx="520" cy="245" rx="128" ry="108"/><ellipse class="radar-cell cell-south" cx="390" cy="390" rx="105" ry="75"/></g><path class="weather-front" d="M125 330 C220 272 264 325 350 259 S503 240 605 167"/><g class="wind-vectors"></g></g>`;
   $('.country-glow').after(layer);
 }
 function renderMapLegend() {
   const legend = mapLegends[state.layer] || mapLegends.condition; const overlay = document.querySelector('.map-overlay');
-  overlay.innerHTML = `${legend.map(([kind, label]) => `<span><i class="legend-swatch ${kind}"></i>${label}</span>`).join('')}<span><i class="legend-swatch warning"></i>IRIMO alert</span><span><i class="legend-swatch site"></i>Site cluster</span>`;
+  const windCount = (state.weatherConditions?.stations || []).filter((station) => station.windKmh != null && station.windDirection).length;
+  overlay.innerHTML = `${legend.map(([kind, label]) => `<span><i class="legend-swatch ${kind}"></i>${label}</span>`).join('')}<span><i class="legend-swatch warning"></i>IRIMO alert</span>${state.layer === 'condition' && windCount ? `<span><i class="legend-swatch wind"></i>${windCount} station winds</span>` : ''}<span><i class="legend-swatch site"></i>Site cluster</span>`;
 }
 function renderWeatherCards(frame) {
   const layer = $('#weather-layer'); if (!layer || !mapProjection || !provinceAnchors.length) return;

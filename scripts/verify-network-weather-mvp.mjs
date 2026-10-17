@@ -17,7 +17,7 @@ const boundary = await readFile(new URL("site/network-weather/data/iran-province
 assert.match(boundary, /"MultiPolygon"/);
 assert.match(html, /31 provinces/);
 assert.match(html, /OSM-derived GeoJSON/);
-for (const concept of ["Network weather radar", "Time machine", "Warnings", "Regional drill-down", "Broadcast run of show", "Presenter mode"]) {
+for (const concept of ["Network weather map", "Time machine", "Warnings", "Regional drill-down", "Broadcast run of show", "Presenter mode"]) {
   assert.match(html, new RegExp(concept.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&"), "i"), `missing MVP concept: ${concept}`);
 }
 console.log("Network Weather MVP verification passed: fixtures, API, accessibility, self-hosting, and top-level UI concepts are covered.");
