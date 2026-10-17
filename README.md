@@ -43,6 +43,8 @@ npm start
 
 Node.js 22 or newer is required.
 
+For server-side provider consensus, copy `.env.example` to `.env` and set `OPENWEATHER_API_KEY` (and optionally `WEATHERAPI_KEY`). The start scripts load this ignored file automatically; credentials never enter the browser bundle or GitHub Pages build.
+
 For maximum drama, select **Tonight**, switch to **Conditions**, and turn on **Presenter mode**. No green screen required.
 
 ## How it works
