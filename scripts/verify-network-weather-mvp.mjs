@@ -10,6 +10,7 @@ const run = (script) => execFileSync(process.execPath, [fileURLToPath(new URL(`s
 run("validate-network-weather.mjs");
 run("verify-network-weather-api.mjs");
 run("verify-network-weather-a11y.mjs");
+run("verify-network-weather-wind.mjs");
 run("verify-selfhost.mjs");
 
 const html = await readFile(new URL("site/network-weather/index.html", root), "utf8");

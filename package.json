@@ -9,7 +9,8 @@
     "verify:network-weather": "node scripts/validate-network-weather.mjs",
     "verify:network-weather-api": "node scripts/verify-network-weather-api.mjs",
     "verify:network-weather-a11y": "node scripts/verify-network-weather-a11y.mjs",
-    "verify:network-weather-mvp": "node scripts/verify-network-weather-mvp.mjs"
+    "verify:network-weather-mvp": "node scripts/verify-network-weather-mvp.mjs",
+    "verify:network-weather-wind": "node scripts/verify-network-weather-wind.mjs"
   },
   "engines": {
     "node": ">=22"

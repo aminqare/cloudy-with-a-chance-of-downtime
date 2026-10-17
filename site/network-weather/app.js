@@ -219,16 +219,22 @@ function updateWeatherMotion(stations = [], condition = 'clear') {
   const bearings = { N:0, NNE:22.5, NE:45, ENE:67.5, E:90, ESE:112.5, SE:135, SSE:157.5, S:180, SSW:202.5, SW:225, WSW:247.5, W:270, WNW:292.5, NW:315, NNW:337.5 };
   const windLayer = layer.querySelector('.wind-vectors');
   if (!windLayer) return;
-  const observed = stations.filter((station) => mapProjection && station.lat != null && station.lon != null && station.windKmh != null && bearings[String(station.windDirection || '').toUpperCase()] != null);
+  const toScreenAngle = (fromBearing) => ((fromBearing + 90) % 360);
+  const observed = stations.filter((station) => mapProjection && station.lat != null && station.lon != null && Number.isFinite(Number(station.windKmh)) && Number(station.windKmh) > 0.5 && bearings[String(station.windDirection || '').toUpperCase()] != null);
   windLayer.innerHTML = observed.map((station, stationIndex) => {
     const [x, y] = mapProjection([station.lon, station.lat]); const speed = Math.max(0, Math.min(90, Number(station.windKmh) || 0));
-    const travelAngle = (bearings[String(station.windDirection).toUpperCase()] + 90) % 360; const length = Math.max(28, Math.min(62, 27 + speed * 3));
-    const duration = Math.max(2.4, Math.min(8.5, 8.8 - speed * .22)); const agreement = station.agreement?.direction;
+    const fromDirection = String(station.windDirection).toUpperCase(); const fromBearing = bearings[fromDirection];
+    const toBearing = (fromBearing + 180) % 360; const toDirection = Object.entries(bearings).sort(([, a], [, b]) => Math.abs(a - toBearing) - Math.abs(b - toBearing))[0][0];
+    // Weather APIs report the direction the wind comes FROM. The screen vector therefore travels toward the opposite bearing.
+    const travelAngle = toScreenAngle(fromBearing); const intensity = Math.min(1, speed / 45);
+    const length = Math.round(34 + intensity * 46); const duration = Math.max(1.8, Math.min(10, 9.4 * Math.pow(5 / Math.max(5, speed), .62)));
+    const agreement = station.agreement?.direction;
     const confidenceClass = agreement?.total > 1 && agreement.votes < agreement.total ? ' wind-disputed' : '';
-    const paths = [-8, 0, 8].map((offset, pathIndex) => `<path class="wind-flow" style="--wind-duration:${duration.toFixed(2)}s;--stream-delay:-${(stationIndex * .47 + pathIndex * .82).toFixed(2)}s" d="M ${(-length / 2).toFixed(1)} ${offset} C ${(-length / 6).toFixed(1)} ${offset - 3}, ${(length / 6).toFixed(1)} ${offset + 3}, ${(length / 2).toFixed(1)} ${offset}"/>`).join('');
-    return `<g class="station-wind${confidenceClass}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${travelAngle})"><title>${escapeHtml(station.name)}: ${escapeHtml(station.windDirection)} ${Math.round(speed)} km/h</title><path class="wind-base" d="M ${(-length / 2).toFixed(1)} 0 L ${(length / 2).toFixed(1)} 0"/>${paths}</g>`;
+    const end = length / 2; const streamsDistance = Math.round(length * 2.6);
+    const paths = [-8, 0, 8].map((offset, pathIndex) => `<path class="wind-flow" style="--wind-duration:${duration.toFixed(2)}s;--wind-distance:${streamsDistance}px;--stream-delay:-${(stationIndex * .47 + pathIndex * .82).toFixed(2)}s" d="M ${(-end).toFixed(1)} ${offset} C ${(-length / 6).toFixed(1)} ${offset - 3}, ${(length / 6).toFixed(1)} ${offset + 3}, ${end.toFixed(1)} ${offset}"/>`).join('');
+    return `<g class="station-wind${confidenceClass}" data-wind-speed="${speed.toFixed(1)}" data-from-direction="${fromDirection}" data-to-direction="${toDirection}" data-wind-duration="${duration.toFixed(2)}" data-vector-length="${length}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${travelAngle})"><title>${escapeHtml(station.name)}: ${escapeHtml(fromDirection)} ${Math.round(speed)} km/h · moving toward ${escapeHtml(toDirection)}</title><path class="wind-base" d="M ${(-end).toFixed(1)} 0 L ${end.toFixed(1)} 0"/>${paths}<path class="wind-arrow" d="M ${(end - 6).toFixed(1)} -4 L ${end.toFixed(1)} 0 L ${(end - 6).toFixed(1)} 4"/></g>`;
   }).join('');
-  const vectors = observed.map((station) => { const angle = ((bearings[String(station.windDirection).toUpperCase()] + 90) % 360) * Math.PI / 180; const speed = Number(station.windKmh) || 0; return [Math.cos(angle) * speed, Math.sin(angle) * speed]; });
+  const vectors = observed.map((station) => { const angle = toScreenAngle(bearings[String(station.windDirection).toUpperCase()]) * Math.PI / 180; const speed = Number(station.windKmh) || 0; return [Math.cos(angle) * speed, Math.sin(angle) * speed]; });
   const averageX = vectors.reduce((sum, vector) => sum + vector[0], 0) / Math.max(1, vectors.length); const averageY = vectors.reduce((sum, vector) => sum + vector[1], 0) / Math.max(1, vectors.length);
   const speed = Math.hypot(averageX, averageY); const travelAngle = Math.atan2(averageY, averageX);
   const distance = Math.max(7, Math.min(30, 6 + speed * .55));
@@ -241,8 +247,7 @@ function updateWeatherMotion(stations = [], condition = 'clear') {
 }
 function ensureBroadcastWeather() {
   if ($('#broadcast-weather-layer')) return;
-  const windReadout = document.createElement('span'); windReadout.id = 'map-hud-wind'; windReadout.textContent = 'Wind N 11 km/h';
-  $('#map-hud-warnings').before(windReadout);
+  if (!$('#map-hud-wind')) { const windReadout = document.createElement('span'); windReadout.id = 'map-hud-wind'; windReadout.textContent = 'Wind observations loading'; $('#map-hud-warnings').before(windReadout); }
   const layer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   layer.id = 'broadcast-weather-layer'; layer.setAttribute('class', 'broadcast-weather-layer'); layer.setAttribute('viewBox', '0 0 760 500'); layer.setAttribute('preserveAspectRatio', 'none'); layer.setAttribute('aria-hidden', 'true');
   layer.innerHTML = `<defs><clipPath id="iran-weather-clip"><path d="M106 148 146 126 181 132 209 112 255 119 281 100 325 112 358 96 402 111 436 105 472 127 505 132 534 157 572 175 594 207 581 233 603 261 592 292 614 317 596 349 561 354 541 384 503 391 477 421 438 411 405 435 370 423 343 403 309 414 280 392 244 397 220 369 184 356 168 322 141 301 151 270 128 237 145 208 123 181Z"/></clipPath><radialGradient id="radar-green"><stop offset="0" stop-color="#69e69e" stop-opacity=".72"/><stop offset=".55" stop-color="#2bcf9a" stop-opacity=".34"/><stop offset="1" stop-color="#2bcf9a" stop-opacity="0"/></radialGradient><radialGradient id="radar-heavy"><stop offset="0" stop-color="#ff6a65" stop-opacity=".8"/><stop offset=".3" stop-color="#ffcb55" stop-opacity=".64"/><stop offset=".68" stop-color="#43d29a" stop-opacity=".32"/><stop offset="1" stop-color="#43d29a" stop-opacity="0"/></radialGradient></defs><g clip-path="url(#iran-weather-clip)"><g class="radar-cells"><ellipse class="radar-cell cell-west" cx="205" cy="235" rx="112" ry="86"/><ellipse class="radar-cell cell-east" cx="520" cy="245" rx="128" ry="108"/><ellipse class="radar-cell cell-south" cx="390" cy="390" rx="105" ry="75"/></g><path class="weather-front" d="M125 330 C220 272 264 325 350 259 S503 240 605 167"/><g class="wind-vectors"></g></g>`;
