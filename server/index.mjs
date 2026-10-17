@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 import { DatabaseSync } from "node:sqlite";
 import { dirname, extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { fetchIrimoWarnings, getNetworkWeatherPayload, networkWeatherFrames, networkWeatherRegions, networkWeatherSchemaVersion, networkWeatherScenarios } from "./network-weather.mjs";
+import { fetchIrimoWarnings, fetchWeatherConditions, getNetworkWeatherPayload, networkWeatherFrames, networkWeatherRegions, networkWeatherSchemaVersion, networkWeatherScenarios, weatherSourceCatalog } from "./network-weather.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(here, "..");
@@ -221,6 +221,17 @@ export const server = createServer(async (request, response) => {
     if (url.pathname === "/api/network-weather/warnings" && request.method === "GET") {
       const payload = await fetchIrimoWarnings({ force: url.searchParams.get("refresh") === "1" });
       sendJson(response, payload);
+      return;
+    }
+
+    if (url.pathname === "/api/network-weather/conditions" && request.method === "GET") {
+      const payload = await fetchWeatherConditions({ force: url.searchParams.get("refresh") === "1" });
+      sendJson(response, payload);
+      return;
+    }
+
+    if (url.pathname === "/api/network-weather/sources" && request.method === "GET") {
+      sendJson(response, { sources: weatherSourceCatalog });
       return;
     }
 

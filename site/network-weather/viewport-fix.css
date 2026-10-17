@@ -1,0 +1,48 @@
+/* Final viewport guardrails: keep the broadcast readable without horizontal clipping. */
+html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+*, *::before, *::after { min-width: 0; }
+.app-shell { width: min(100% - 32px, 1480px); }
+main { min-width: 0; }
+.broadcast-grid, .lower-grid, .ops-body, .panel-heading, .map-foot, .time-mode { min-width: 0; }
+.broadcast-grid { grid-template-columns: minmax(0, 1.55fr) minmax(280px, .72fr); }
+.right-rail { min-width: 0; }
+.map-panel, .map-canvas, .panel { min-width: 0; max-width: 100%; }
+.panel-heading { gap: 14px; }
+.map-tools { max-width: 100%; min-width: 0; overflow-x: auto; scrollbar-width: thin; }
+.map-foot { flex-wrap: wrap; row-gap: 8px; }
+.map-foot #map-source { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.time-mode { flex-wrap: wrap; justify-content: flex-end; }
+.ops-summary { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.ops-table-wrap { max-width: 100%; }
+
+@media (max-width: 1100px) {
+  .broadcast-grid { grid-template-columns: 1fr; }
+  .right-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .ops-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .app-shell { width: calc(100% - 20px); }
+  .topbar { height: auto; min-height: 68px; align-items: flex-start; gap: 12px; flex-wrap: wrap; padding: 12px 0; }
+  .topbar-actions { max-width: 100%; flex-wrap: wrap; }
+  .forecast-header { display: block; }
+  .condition-badge { width: 100%; margin-top: 14px; }
+  .right-rail, .lower-grid { grid-template-columns: 1fr; }
+  .broadcast-crawl { grid-template-columns: 1fr 1fr; }
+  .kpi-grid, .ops-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ops-body { grid-template-columns: 1fr; }
+  .map-canvas { height: min(78vw, 390px); min-height: 320px; }
+  .map-tools { justify-content: flex-start; }
+  .map-foot > * { max-width: 100%; }
+  .time-mode { justify-content: flex-start; }
+  .footer { gap: 10px; flex-wrap: wrap; }
+}
+
+@media (max-width: 450px) {
+  .broadcast-crawl { grid-template-columns: 1fr; }
+  .map-canvas { height: 330px; }
+  .map-canvas .province-weather { transform: translate(-50%, -50%) scale(.86); }
+  .panel-heading { padding-inline: 13px; }
+  .ops-table { min-width: 480px; }
+}

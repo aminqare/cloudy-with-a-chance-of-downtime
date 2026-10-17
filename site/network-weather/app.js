@@ -1,7 +1,7 @@
 const api = window.NetworkWeatherApi;
 const $ = (selector) => document.querySelector(selector);
 const urlFrame = Number(new URLSearchParams(window.location.search).get('frame'));
-const state = { frame: Number.isInteger(urlFrame) && urlFrame >= 0 && urlFrame < 13 ? urlFrame : 6, playing: false, speed: 1, layer: 'condition', audience: 'executive', reducedMotion: false, story: 0, mapZoom: 1, mapX: 0, mapY: 0, acknowledgedAlerts: new Set(), irimoWarnings: [], irimoStatus: 'loading', selectedProvince: null };
+const state = { frame: Number.isInteger(urlFrame) && urlFrame >= 0 && urlFrame < 13 ? urlFrame : 6, playing: false, speed: 1, layer: 'condition', audience: 'executive', reducedMotion: false, story: 0, mapZoom: 1, mapX: 0, mapY: 0, acknowledgedAlerts: new Set(), irimoWarnings: [], irimoStatus: 'loading', weatherConditions: null, weatherStatus: 'loading', selectedProvince: null };
 try { state.acknowledgedAlerts = new Set(JSON.parse(localStorage.getItem('network-weather-acknowledged') || '[]')); } catch { state.acknowledgedAlerts = new Set(); }
 const conditions = {
   clear: { label:'CLEAR', weather:'sunny', title:'Mostly clear network conditions', detail:'Strong availability across the metro with isolated pressure building toward the evening peak.', className:'clear' },
@@ -107,14 +107,19 @@ function render() {
   $('#broadcast-next').textContent = `${frame.utilization > 78 ? 'Peak pressure' : 'Demand building'} · ${api.frames[Math.min(state.frame + 1, api.frames.length - 1)].time} IRST`;
   $('#broadcast-risk').textContent = frame.state === 'storm' ? 'East outage risk · Airport maintenance' : 'East interference · North congestion watch';
   $('#confidence').textContent = `Confidence ${frame.confidence}%`; $('#source-state').textContent = `Demo telemetry · ${frame.observed ? 'Observed scenario' : 'Forecast scenario'}`;
-  $('#broadcast-source').textContent = state.irimoStatus === 'live' ? 'Demo telemetry · IRIMO live' : `Demo telemetry · IRIMO ${state.irimoStatus}`;
+  const weatherSource = state.weatherConditions?.source?.provider || 'Open-Meteo';
+  const weatherLabel = state.weatherStatus === 'live' ? `${weatherSource} live wind` : `${weatherSource} ${state.weatherStatus}`;
+  $('#broadcast-source').textContent = state.irimoStatus === 'live' ? `IRIMO live · ${weatherLabel}` : `IRIMO ${state.irimoStatus} · ${weatherLabel}`;
   $('#selected-time').textContent = `${frame.time} IRST`; $('#selected-state').textContent = frame.observed ? 'Observed condition' : 'Forecast condition'; $('#timeline-confidence').textContent = `Confidence ${frame.confidence}%`;
   $('#timeline').value = state.frame; renderSites(frame); renderWeatherCards(frame); renderKpis(frame); renderOperations(frame); renderAlerts(frame); renderDetails(frame); renderStories();
   $('#map-hud-time').textContent = `${frame.time} IRST · ${frame.observed ? 'Observed' : 'Forecast'}`;
   $('#map-hud-layer').textContent = `${state.layer[0].toUpperCase()}${state.layer.slice(1)}`;
   $('#map-hud-warnings').textContent = state.irimoWarnings.length ? `${state.irimoWarnings.length} IRIMO warnings` : 'IRIMO feed loading';
-  const wind = frame.state === 'storm' ? ['SW', 32] : frame.state === 'rain' ? ['W', 24] : frame.state === 'cloud' ? ['NW', 17] : ['N', 11];
-  ensureBroadcastWeather(); $('#map-hud-wind').textContent = `Wind ${wind[0]} ${wind[1]} km/h`;
+  const liveTehran = state.weatherConditions?.stations?.find((station) => station.id === 'tehran');
+  const wind = liveTehran?.windKmh != null
+    ? [liveTehran.windDirection, Math.round(liveTehran.windKmh), liveTehran.windGustKmh]
+    : frame.state === 'storm' ? ['SW', 32] : frame.state === 'rain' ? ['W', 24] : frame.state === 'cloud' ? ['NW', 17] : ['N', 11];
+  ensureBroadcastWeather(); $('#map-hud-wind').textContent = `Wind ${wind[0]} ${wind[1]} km/h${wind[2] != null ? ` · gust ${Math.round(wind[2])}` : ''}`;
   $('#map-canvas').dataset.weather = frame.state;
 }
 
@@ -138,7 +143,10 @@ function renderOperations(frame) {
     const status = row.riskScore >= 82 ? 'critical' : row.riskScore >= 65 ? 'watch' : 'healthy';
     return `<tr class="${status}"><td><strong>${row.name}</strong><small>${row.technology}${row.maintenance !== 'No window' ? ` · ${row.maintenance}` : ''}</small></td><td>${row.trafficGbps} <small>Gbps</small></td><td><b>${row.congestion}%</b><div class="ops-meter"><i style="width:${row.congestion}%"></i></div></td><td>${row.coverage.toFixed(1)}%</td><td><span class="ops-status ${status}">${status === 'critical' ? 'REVIEW' : status === 'watch' ? 'WATCH' : 'OK'}</span></td></tr>`;
   }).join('');
-  $('#ops-sources-list').innerHTML = Object.values(api.operations).map((source) => `<div class="ops-source"><span class="ops-source-dot ${source.state}"></span><div><strong>${source.label}</strong><small>${source.value} · ${source.detail}</small></div><em>${source.state === 'live' ? 'SOURCE' : source.state.toUpperCase()}</em></div>`).join('');
+  const sources = Object.values(api.operations).map((source) => `<div class="ops-source"><span class="ops-source-dot ${source.state}"></span><div><strong>${source.label}</strong><small>${source.value} · ${source.detail}</small></div><em>${source.state === 'live' ? 'SOURCE' : source.state.toUpperCase()}</em></div>`);
+  const weatherState = state.weatherStatus === 'live' ? 'live' : state.weatherStatus === 'stale' ? 'ready' : 'demo';
+  sources.push(`<div class="ops-source"><span class="ops-source-dot ${weatherState}"></span><div><strong>${state.weatherConditions?.source?.provider || 'Open-Meteo'} weather</strong><small>Wind, temperature, humidity · Iran hub stations</small></div><em>${state.weatherStatus.toUpperCase()}</em></div>`);
+  $('#ops-sources-list').innerHTML = sources.join('');
 }
 function narrative(frame) {
   if (frame.state === 'storm') return `Severe network weather is expected across the metro by ${frame.time}. Utilization reaches ${frame.utilization}%, latency rises to ${frame.latency} milliseconds, and ${frame.incidents} active incidents need attention. Confidence is ${frame.confidence}%.`;
@@ -297,6 +305,36 @@ function renderDetails(frame) {
   $('#detail-content').innerHTML = `${body}<div class="detail-stat"><span>Selected time</span><strong>${frame.time} IRST · ${frame.observed ? 'observed' : 'forecast'} demo frame</strong></div>`;
 }
 function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[character])); }
+function applyWeatherConditions(payload) {
+  if (!payload || !Array.isArray(payload.stations) || !payload.stations.length) throw new Error('Weather source returned no stations');
+  state.weatherConditions = payload;
+  state.weatherStatus = payload.status || 'fallback';
+  render();
+}
+async function loadWeatherConditions() {
+  try {
+    const response = await fetch('/api/network-weather/conditions', { cache: 'no-store' });
+    if (!response.ok) throw new Error(`Weather API returned ${response.status}`);
+    applyWeatherConditions(await response.json());
+    return;
+  } catch (proxyError) {
+    try {
+      const direct = new URL('https://api.open-meteo.com/v1/forecast');
+      direct.searchParams.set('latitude', '35.6892'); direct.searchParams.set('longitude', '51.389');
+      direct.searchParams.set('current', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m');
+      direct.searchParams.set('timezone', 'Asia/Tehran'); direct.searchParams.set('forecast_days', '1');
+      const response = await fetch(direct, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Open-Meteo direct request returned ${response.status}`);
+      const raw = await response.json(); const current = raw.current || {};
+      applyWeatherConditions({ status: 'live', fetchedAt: new Date().toISOString(), source: { provider: 'Open-Meteo', url: 'https://open-meteo.com/en/docs' }, stations: [{ id: 'tehran', name: 'Tehran', temperatureC: current.temperature_2m ?? null, humidity: current.relative_humidity_2m ?? null, weatherCode: current.weather_code ?? null, windKmh: current.wind_speed_10m ?? null, windGustKmh: current.wind_gusts_10m ?? null, windDirection: ['N','NE','E','SE','S','SW','W','NW'][Math.round(Number(current.wind_direction_10m || 0) / 45) % 8], observedAt: current.time || null }] });
+      return;
+    } catch (directError) {
+      state.weatherStatus = 'demo';
+      console.warn('Weather conditions unavailable; keeping demo wind telemetry', proxyError, directError);
+      render();
+    }
+  }
+}
 async function loadIrimoWarnings() {
   const list = $('#irimo-live-list'); const status = $('#irimo-feed-status');
   try {
@@ -340,6 +378,7 @@ function renderIrimoPayload(payload) {
 }
 loadIrimoWarnings();
 loadIranBoundary();
+loadWeatherConditions();
 function ruleAlerts(frame) {
   const generated = [];
   if (frame.utilization >= 80) generated.push({ id:'rule-utilization-' + frame.time, groupId:'rule-utilization', severity:'warning', icon:'⚠', title:'Utilization threshold crossed', detail:'Rule: utilization is at or above 80%', region:'north', time:frame.time, state:frame.observed ? 'Observed' : 'Forecast', confidence:frame.confidence, impact:'Customer latency risk' });

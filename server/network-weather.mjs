@@ -13,6 +13,7 @@ export const irimoWarningLevels = {
 };
 
 let irimoWarningCache = { fetchedAt: 0, data: null };
+let weatherConditionCache = { fetchedAt: 0, data: null };
 const irimoCities = JSON.parse(readFileSync(new URL("../site/network-weather/data/iran-cities.json", import.meta.url), "utf8"));
 const provinceNames = new Map([
   ["آذربایجان شرقی", "East Azerbaijan"], ["اذربایجان شرقی", "East Azerbaijan"], ["آذربایجان غربی", "West Azerbaijan"],
@@ -24,6 +25,54 @@ const provinceNames = new Map([
   ["لرستان", "Lorestan"], ["مازندران", "Mazandaran"], ["مرکزی", "Markazi"], ["هرمزگان", "Hormozgan"], ["همدان", "Hamadan"], ["یزد", "Yazd"],
 ]);
 
+export const weatherSourceCatalog = [
+  { provider: "IRIMO", role: "official Iranian warnings", access: "HTML parser + scheduled snapshot", url: irimoWarningListUrl },
+  { provider: "Open-Meteo", role: "live wind, temperature, humidity, and weather code", access: "public forecast API; no key for non-commercial use", url: "https://open-meteo.com/en/docs" },
+  { provider: "OpenWeatherMap", role: "production fallback and alerts", access: "API key required", url: "https://docs.openweather.co.uk/api/one-call-3" },
+  { provider: "WeatherAPI.com", role: "production fallback and historical weather", access: "API key required", url: "https://www.weatherapi.com/docs/" },
+];
+
+const weatherStations = [
+  { id: "tehran", name: "Tehran", lat: 35.6892, lon: 51.3890 },
+  { id: "tabriz", name: "Tabriz", lat: 38.0962, lon: 46.2738 },
+  { id: "mashhad", name: "Mashhad", lat: 36.2605, lon: 59.6168 },
+  { id: "isfahan", name: "Isfahan", lat: 32.6546, lon: 51.6680 },
+  { id: "shiraz", name: "Shiraz", lat: 29.5918, lon: 52.5837 },
+  { id: "bandar-abbas", name: "Bandar Abbas", lat: 27.1832, lon: 56.2666 },
+];
+
+function windCompass(degrees) {
+  const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+  return directions[Math.round(Number(degrees || 0) / 45) % directions.length];
+}
+
+export async function fetchWeatherConditions({ force = false } = {}) {
+  const cacheAge = Date.now() - weatherConditionCache.fetchedAt;
+  if (!force && weatherConditionCache.data && cacheAge < 5 * 60 * 1000) return weatherConditionCache.data;
+  try {
+    const url = new URL("https://api.open-meteo.com/v1/forecast");
+    url.searchParams.set("latitude", weatherStations.map((station) => station.lat).join(","));
+    url.searchParams.set("longitude", weatherStations.map((station) => station.lon).join(","));
+    url.searchParams.set("current", "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m");
+    url.searchParams.set("timezone", "Asia/Tehran");
+    url.searchParams.set("forecast_days", "1");
+    const response = await fetch(url, { headers: { "user-agent": "Network Weather MVP/1.0" }, signal: AbortSignal.timeout(8000) });
+    if (!response.ok) throw new Error(`Open-Meteo returned ${response.status}`);
+    const raw = await response.json();
+    const records = Array.isArray(raw) ? raw : [raw];
+    const stations = weatherStations.map((station, index) => {
+      const current = records[index]?.current || {};
+      return { ...station, temperatureC: current.temperature_2m ?? null, humidity: current.relative_humidity_2m ?? null, weatherCode: current.weather_code ?? null, windKmh: current.wind_speed_10m ?? null, windGustKmh: current.wind_gusts_10m ?? null, windDirection: windCompass(current.wind_direction_10m), observedAt: current.time || null };
+    });
+    const data = { status: "live", fetchedAt: new Date().toISOString(), source: { provider: "Open-Meteo", url: "https://open-meteo.com/en/docs" }, stations };
+    weatherConditionCache = { fetchedAt: Date.now(), data };
+    return data;
+  } catch (error) {
+    if (weatherConditionCache.data) return { ...weatherConditionCache.data, status: "stale", error: "Open-Meteo refresh failed; showing the last successful fetch." };
+    return { status: "fallback", fetchedAt: new Date().toISOString(), source: { provider: "Open-Meteo", url: "https://open-meteo.com/en/docs" }, stations: [], error: error.message };
+  }
+}
+
 function requestIrimoHtml(targetUrl = irimoWarningListUrl) {
   return new Promise((resolve, reject) => {
     const request = https.get(targetUrl, {
@@ -33,7 +82,15 @@ function requestIrimoHtml(targetUrl = irimoWarningListUrl) {
       agent: new https.Agent({ ciphers: "DEFAULT@SECLEVEL=1" }),
     }, (response) => {
       const chunks = [];
-      response.on("data", (chunk) => chunks.push(chunk));
+      let received = 0;
+      response.on("data", (chunk) => {
+        received += chunk.length;
+        if (received > 2 * 1024 * 1024) {
+          request.destroy(new Error("IRIMO response exceeded the 2 MB safety limit"));
+          return;
+        }
+        chunks.push(chunk);
+      });
       response.on("end", () => {
         if (response.statusCode < 200 || response.statusCode >= 300) {
           reject(new Error(`IRIMO returned ${response.statusCode}`));
@@ -138,7 +195,8 @@ export function parseIrimoWarnings(html, sourceUrl = irimoWarningListUrl) {
       date,
       url: href,
       sourceUrl,
-      live: true,
+      live: false,
+      status: "official-bulletin",
     });
   }
   return warnings.slice(0, 24);
