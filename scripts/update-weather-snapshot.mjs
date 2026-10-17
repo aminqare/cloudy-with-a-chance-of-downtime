@@ -2,7 +2,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fetchWeatherConditions } from "../server/network-weather.mjs";
 
 const outputPath = new URL("../site/network-weather/data/weather-conditions.json", import.meta.url);
-const payload = await fetchWeatherConditions({ force: true });
+const payload = await fetchWeatherConditions({ force: true, includeIrimo: false });
 if (!payload.stations?.length) throw new Error("Weather providers returned no station data");
 
 const stable = (value) => JSON.stringify({

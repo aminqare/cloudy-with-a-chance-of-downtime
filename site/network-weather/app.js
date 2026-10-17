@@ -317,9 +317,16 @@ function applyWeatherConditions(payload) {
 }
 function renderWeatherConsensus() {
   const box = $('#weather-consensus');
-  const consensus = state.weatherConditions?.warningConsensus || (state.weatherConditions && state.irimoWarnings.length ? { active: true, votes: ['IRIMO'], clearVotes: [], unavailable: ['OpenWeatherMap', 'WeatherAPI.com'], unsupported: ['Open-Meteo'], totalAvailable: 1 } : null);
+  const rawConsensus = state.weatherConditions?.warningConsensus;
+  const consensus = rawConsensus ? { ...rawConsensus, votes: [...rawConsensus.votes], clearVotes: [...rawConsensus.clearVotes] } : (state.weatherConditions && state.irimoWarnings.length ? { active: true, votes: [], clearVotes: [], unavailable: ['OpenWeatherMap', 'WeatherAPI.com'], unsupported: ['Open-Meteo'], totalAvailable: 0 } : null);
   if (!box) return;
   if (!consensus) { box.innerHTML = '<b>Cross-source consensus</b><span>Waiting for provider votes…</span>'; return; }
+  if (state.irimoWarnings.length) {
+    consensus.votes = consensus.votes.filter((provider) => provider !== 'IRIMO');
+    consensus.clearVotes = consensus.clearVotes.filter((provider) => provider !== 'IRIMO');
+    consensus.votes.push('IRIMO');
+  }
+  consensus.active = consensus.votes.length >= Math.ceil((consensus.votes.length + consensus.clearVotes.length) / 2);
   const supporting = consensus.votes.length ? consensus.votes.join(', ') : 'none';
   const dissenting = consensus.clearVotes.length ? consensus.clearVotes.join(', ') : 'none';
   const unavailable = consensus.unavailable.length ? `Unavailable: ${consensus.unavailable.join(', ')}.` : '';

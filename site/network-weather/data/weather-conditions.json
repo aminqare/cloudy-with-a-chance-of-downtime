@@ -1,6 +1,6 @@
 {
   "status": "live",
-  "fetchedAt": "2026-10-17T05:20:00.720Z",
+  "fetchedAt": "2026-10-17T05:21:58.525Z",
   "source": {
     "provider": "Open-Meteo + WeatherAPI.com",
     "url": "https://open-meteo.com/en/docs"
@@ -500,10 +500,11 @@
   "warningConsensus": {
     "active": true,
     "votes": [
-      "IRIMO",
       "WeatherAPI.com"
     ],
-    "clearVotes": [],
+    "clearVotes": [
+      "IRIMO"
+    ],
     "unavailable": [
       "OpenWeatherMap"
     ],
