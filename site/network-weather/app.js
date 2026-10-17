@@ -226,7 +226,7 @@ function updateWeatherMotion(direction = 'N', windKmh = 11, condition = 'clear')
   const radians = travelAngle * Math.PI / 180;
   const driftX = Math.cos(radians) * distance; const driftY = Math.sin(radians) * distance;
   layer.style.setProperty('--wind-angle', `${travelAngle}deg`);
-  layer.style.setProperty('--wind-duration', `${Math.max(2.8, Math.min(10, 11 - speed * .18)).toFixed(2)}s`);
+  layer.style.setProperty('--wind-duration', `${Math.max(2.4, Math.min(7.5, 7.8 - speed * .13)).toFixed(2)}s`);
   layer.style.setProperty('--cell-duration', `${Math.max(6, Math.min(13, 14 - speed * .16)).toFixed(2)}s`);
   layer.style.setProperty('--front-duration', `${Math.max(5, Math.min(14, 15 - speed * .2)).toFixed(2)}s`);
   layer.style.setProperty('--drift-x', `${driftX.toFixed(1)}px`); layer.style.setProperty('--drift-y', `${driftY.toFixed(1)}px`);
@@ -239,7 +239,9 @@ function ensureBroadcastWeather() {
   $('#map-hud-warnings').before(windReadout);
   const layer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   layer.id = 'broadcast-weather-layer'; layer.setAttribute('class', 'broadcast-weather-layer'); layer.setAttribute('viewBox', '0 0 760 500'); layer.setAttribute('preserveAspectRatio', 'none'); layer.setAttribute('aria-hidden', 'true');
-  layer.innerHTML = `<defs><clipPath id="iran-weather-clip"><path d="M106 148 146 126 181 132 209 112 255 119 281 100 325 112 358 96 402 111 436 105 472 127 505 132 534 157 572 175 594 207 581 233 603 261 592 292 614 317 596 349 561 354 541 384 503 391 477 421 438 411 405 435 370 423 343 403 309 414 280 392 244 397 220 369 184 356 168 322 141 301 151 270 128 237 145 208 123 181Z"/></clipPath><radialGradient id="radar-green"><stop offset="0" stop-color="#69e69e" stop-opacity=".72"/><stop offset=".55" stop-color="#2bcf9a" stop-opacity=".34"/><stop offset="1" stop-color="#2bcf9a" stop-opacity="0"/></radialGradient><radialGradient id="radar-heavy"><stop offset="0" stop-color="#ff6a65" stop-opacity=".8"/><stop offset=".3" stop-color="#ffcb55" stop-opacity=".64"/><stop offset=".68" stop-color="#43d29a" stop-opacity=".32"/><stop offset="1" stop-color="#43d29a" stop-opacity="0"/></radialGradient><marker id="wind-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#fffaf0"/></marker></defs><g clip-path="url(#iran-weather-clip)"><g class="radar-cells"><ellipse class="radar-cell cell-west" cx="205" cy="235" rx="112" ry="86"/><ellipse class="radar-cell cell-east" cx="520" cy="245" rx="128" ry="108"/><ellipse class="radar-cell cell-south" cx="390" cy="390" rx="105" ry="75"/></g><path class="weather-front" d="M125 330 C220 272 264 325 350 259 S503 240 605 167"/><g class="wind-vectors"><path d="M115 175 C175 169 230 181 290 175"/><path d="M180 280 C245 270 305 291 370 280"/><path d="M320 365 C385 354 449 376 520 365"/><path d="M430 205 C490 196 548 214 610 205"/></g></g>`;
+  const streamPaths = ['M45 120 C170 82 270 152 400 112 S610 72 720 118','M35 185 C160 145 280 214 405 178 S610 140 730 184','M28 250 C160 212 275 278 400 246 S610 207 735 248','M40 315 C170 278 285 343 410 310 S610 274 725 314','M68 380 C190 343 300 408 420 376 S600 342 700 378'];
+  const streams = streamPaths.map((path, index) => `<path class="wind-base" d="${path}"/><path class="wind-flow" style="--stream-delay:-${(index * 1.13).toFixed(2)}s" d="${path}"/>`).join('');
+  layer.innerHTML = `<defs><clipPath id="iran-weather-clip"><path d="M106 148 146 126 181 132 209 112 255 119 281 100 325 112 358 96 402 111 436 105 472 127 505 132 534 157 572 175 594 207 581 233 603 261 592 292 614 317 596 349 561 354 541 384 503 391 477 421 438 411 405 435 370 423 343 403 309 414 280 392 244 397 220 369 184 356 168 322 141 301 151 270 128 237 145 208 123 181Z"/></clipPath><radialGradient id="radar-green"><stop offset="0" stop-color="#69e69e" stop-opacity=".72"/><stop offset=".55" stop-color="#2bcf9a" stop-opacity=".34"/><stop offset="1" stop-color="#2bcf9a" stop-opacity="0"/></radialGradient><radialGradient id="radar-heavy"><stop offset="0" stop-color="#ff6a65" stop-opacity=".8"/><stop offset=".3" stop-color="#ffcb55" stop-opacity=".64"/><stop offset=".68" stop-color="#43d29a" stop-opacity=".32"/><stop offset="1" stop-color="#43d29a" stop-opacity="0"/></radialGradient></defs><g clip-path="url(#iran-weather-clip)"><g class="radar-cells"><ellipse class="radar-cell cell-west" cx="205" cy="235" rx="112" ry="86"/><ellipse class="radar-cell cell-east" cx="520" cy="245" rx="128" ry="108"/><ellipse class="radar-cell cell-south" cx="390" cy="390" rx="105" ry="75"/></g><path class="weather-front" d="M125 330 C220 272 264 325 350 259 S503 240 605 167"/><g class="wind-vectors">${streams}</g></g>`;
   $('.country-glow').after(layer);
 }
 function renderMapLegend() {
@@ -264,13 +266,19 @@ function renderWeatherCards(frame) {
   $('#map-data-strip').innerHTML = `<span><small>National traffic</small><strong>${(totalTraffic / 1000).toFixed(2)} Tbps</strong></span><span><small>Population coverage</small><strong>${averageCoverage.toFixed(1)}%</strong></span><span><small>Congested provinces</small><strong>${congested}</strong></span><span><small>Active incidents</small><strong>${incidents}</strong></span>`;
   nodes.forEach((province, index) => {
     const metrics = province.metrics; const display = provinceLayerDisplay(metrics, province.warning); const weatherState = display.state;
+    const warningLevel = province.warning?.level;
+    const provincePath = [...document.querySelectorAll('.province-shape')].find((path) => provinceKey(path.dataset.province) === provinceKey(province.name));
+    provincePath?.classList.add(`wx-${weatherState}`); if (warningLevel) provincePath?.classList.add(`warning-${warningLevel}`);
+    const liveConditionView = state.layer === 'condition' && state.weatherConditions?.stations?.length;
+    const quietWarningProvince = state.layer === 'warnings' && !province.warning;
+    if (liveConditionView || quietWarningProvince) return;
     const localCandidates = offsets.map(([dx, dy]) => ({ x:Math.max(30, Math.min(730, province.x + dx)), y:Math.max(58, Math.min(454, province.y + dy)) }));
     const gridCandidates = Array.from({ length:13 }, (_, row) => Array.from({ length:13 }, (_, column) => ({ x:55 + column * 54, y:62 + row * 32 }))).flat().sort((a, b) => Math.hypot(a.x - province.x, a.y - province.y) - Math.hypot(b.x - province.x, b.y - province.y));
     const candidate = [...localCandidates, ...gridCandidates].find(({ x, y }) => placed.every((point) => Math.abs(point.x - x) > 52 || Math.abs(point.y - y) > 30)) || { x:province.x, y:province.y };
     placed.push(candidate);
     const leader = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     leader.innerHTML = `<line x1="${province.x}" y1="${province.y}" x2="${candidate.x}" y2="${candidate.y}"/><circle cx="${province.x}" cy="${province.y}" r="2.2"/>`; leaders.append(leader);
-    const warningLevel = province.warning?.level; const card = document.createElement('button');
+    const card = document.createElement('button');
     card.className = `province-weather ${weatherState} layer-${state.layer}${warningLevel ? ` has-warning warning-${warningLevel}` : ''}`;
     card.style.left = `${candidate.x / 760 * 100}%`; card.style.top = `${candidate.y / 500 * 100}%`;
     const shortName = province.name.replace('East Azerbaijan','E Azerbaijan').replace('West Azerbaijan','W Azerbaijan').replace('Razavi Khorasan','Razavi Khor.').replace('North Khorasan','N Khorasan').replace('South Khorasan','S Khorasan').replace('Sistan and Baluchestan','Sistan').replace('Chaharmahal and Bakhtiari','Chaharmahal').replace('Kohgiluyeh and Boyer-Ahmad','Kohgiluyeh');
@@ -280,8 +288,6 @@ function renderWeatherCards(frame) {
     const showWarningBadge = warningLevel && state.layer === 'warnings';
     card.innerHTML = `<span class="province-weather-main"><b>${escapeHtml(display.value)}</b><span class="province-weather-icon">${glyph}</span></span><small>${escapeHtml(shortName)}</small>${showWarningBadge ? `<em aria-hidden="true">!</em>` : ''}`;
     card.addEventListener('click', () => { state.selectedProvince = province.name; renderDetails(frame); document.querySelectorAll('.province-shape').forEach((path) => path.classList.toggle('selected-province', provinceKey(path.dataset.province) === provinceKey(province.name))); if (province.warning) { document.querySelector(`[data-irimo-card="${CSS.escape(province.warning.id)}"]`)?.scrollIntoView({ behavior:'smooth', block:'nearest' }); document.querySelectorAll('.irimo-warning').forEach((item) => item.classList.toggle('selected', item.dataset.irimoCard === province.warning.id)); } });
-    const provincePath = [...document.querySelectorAll('.province-shape')].find((path) => provinceKey(path.dataset.province) === provinceKey(province.name));
-    provincePath?.classList.add(`wx-${weatherState}`); if (warningLevel) provincePath?.classList.add(`warning-${warningLevel}`);
     layer.append(card);
   });
 }
@@ -291,16 +297,18 @@ function liveConditionIcon(condition) {
 function renderLiveStations() {
   const layer = $('#live-station-layer');
   if (!layer || !mapProjection) return;
+  layer.style.display = state.layer === 'condition' ? 'block' : 'none';
   const stations = state.weatherConditions?.stations || [];
   if (!stations.length) { layer.innerHTML = ''; return; }
   layer.innerHTML = stations.map((station) => {
     const [x, y] = mapProjection([station.lon, station.lat]);
+    const cardX = Math.max(58, Math.min(702, x)); const cardY = Math.max(92, Math.min(438, y));
     const condition = station.weatherCondition || 'clear';
     const agreement = station.agreement?.condition;
     const agreementLabel = agreement?.total > 1 ? `${agreement.votes}/${agreement.total} agree` : 'live';
     const temp = station.temperatureC == null ? '—' : `${Math.round(station.temperatureC)}°`;
     const wind = station.windKmh == null ? '—' : `${station.windDirection || 'N'} ${Math.round(station.windKmh)}`;
-    return `<button class="live-station-card live-${escapeHtml(condition)}" style="left:${x / 760 * 100}%;top:${y / 500 * 100}%" title="${escapeHtml(station.name)} · ${temp} · wind ${escapeHtml(wind)} km/h · ${escapeHtml(agreementLabel)}" aria-label="${escapeHtml(station.name)} live weather: ${temp}, wind ${escapeHtml(wind)} kilometres per hour, ${escapeHtml(agreementLabel)}"><span class="live-station-head"><b>${escapeHtml(station.name)}</b><i>${liveConditionIcon(condition)}</i></span><strong>${escapeHtml(temp)}</strong><small>${escapeHtml(wind)} km/h · ${escapeHtml(agreementLabel)}</small></button>`;
+    return `<button class="live-station-card live-${escapeHtml(condition)}" style="left:${cardX / 760 * 100}%;top:${cardY / 500 * 100}%" title="${escapeHtml(station.name)} · ${temp} · wind ${escapeHtml(wind)} km/h · ${escapeHtml(agreementLabel)}" aria-label="${escapeHtml(station.name)} live weather: ${temp}, wind ${escapeHtml(wind)} kilometres per hour, ${escapeHtml(agreementLabel)}"><span class="live-station-head"><b>${escapeHtml(station.name)}</b><i>${liveConditionIcon(condition)}</i></span><strong>${escapeHtml(temp)}</strong><small>${escapeHtml(wind)} km/h · ${escapeHtml(agreementLabel)}</small></button>`;
   }).join('');
   applyMapTransform();
 }

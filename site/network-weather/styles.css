@@ -59,15 +59,14 @@
 .radar-cell.cell-east{animation-delay:-4s;fill:url(#radar-heavy)}.radar-cell.cell-south{animation-delay:-8s;opacity:.55}
 .weather-front{fill:none;stroke:rgba(217,248,255,.76);stroke-width:2.1;stroke-dasharray:4 10;stroke-linecap:round;filter:drop-shadow(0 0 4px rgba(113,209,236,.55));animation:weatherFront var(--front-duration) linear infinite;will-change:stroke-dashoffset}
 .wind-vectors{transform-box:view-box;transform-origin:center;transform:rotate(var(--wind-angle));transition:transform 1.2s cubic-bezier(.22,.61,.36,1);will-change:transform}
-.wind-vectors path{fill:none;stroke:rgba(209,247,255,.7);stroke-width:1.5;stroke-linecap:round;stroke-dasharray:6 14;marker-end:url(#wind-arrow);animation:windFlow var(--wind-duration) linear infinite;will-change:stroke-dashoffset}
-.wind-vectors path:nth-child(2){animation-delay:-1.1s}.wind-vectors path:nth-child(3){animation-delay:-2.4s}.wind-vectors path:nth-child(4){animation-delay:-3.3s}
+.wind-vectors path{fill:none;vector-effect:non-scaling-stroke}.wind-base{stroke:rgba(255,250,240,.2);stroke-width:.7;stroke-linecap:round}.wind-flow{stroke:rgba(255,250,240,.88);stroke-width:2;stroke-linecap:round;stroke-dasharray:1 13;animation:windFlow var(--wind-duration) linear var(--stream-delay,0s) infinite;filter:drop-shadow(0 0 2px rgba(255,250,240,.5));will-change:stroke-dashoffset}
 .map-canvas[data-weather="clear"] .radar-cell{opacity:.08}.map-canvas[data-weather="clear"] .weather-front{opacity:.18}.map-canvas[data-weather="clear"] .wind-vectors{opacity:.42}
 .map-canvas[data-weather="cloud"] .radar-cell{opacity:.24}.map-canvas[data-weather="cloud"] .weather-front{opacity:.42}
 .map-canvas[data-weather="rain"] .radar-cell{opacity:.56}.map-canvas[data-weather="storm"] .radar-cell{opacity:.9}.map-canvas[data-weather="storm"] .weather-front{stroke-width:2.8}
 .map-canvas:not([data-layer="condition"]) .broadcast-weather-layer{opacity:.12}.map-canvas[data-layer="warnings"] .broadcast-weather-layer{opacity:.2}
 @keyframes weatherAdvection{0%{transform:translate(var(--drift-start-x),var(--drift-start-y)) scale(.96);opacity:0}16%{opacity:var(--cell-mid)}55%{opacity:var(--cell-peak)}84%{opacity:var(--cell-mid)}100%{transform:translate(var(--drift-x),var(--drift-y)) scale(1.045);opacity:0}}
 @keyframes weatherFront{to{stroke-dashoffset:-112}}
-@keyframes windFlow{to{stroke-dashoffset:-160}}
+@keyframes windFlow{to{stroke-dashoffset:-140}}
 @media (prefers-reduced-motion:reduce){.radar-cell,.weather-front,.wind-vectors path{animation:none!important}}
 
 /* Operational readability pass: keep the map and warning rail independent. */
