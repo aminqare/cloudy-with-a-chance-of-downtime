@@ -334,6 +334,15 @@ async function loadWeatherConditions() {
     return;
   } catch (proxyError) {
     try {
+      const snapshotResponse = await fetch('./data/weather-conditions.json', { cache: 'no-store' });
+      if (snapshotResponse.ok) {
+        applyWeatherConditions({ ...(await snapshotResponse.json()), status: 'snapshot' });
+        return;
+      }
+    } catch (snapshotError) {
+      console.warn('Weather snapshot unavailable; trying direct provider fallback', snapshotError);
+    }
+    try {
       const direct = new URL('https://api.open-meteo.com/v1/forecast');
       direct.searchParams.set('latitude', '35.6892'); direct.searchParams.set('longitude', '51.389');
       direct.searchParams.set('current', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m');
