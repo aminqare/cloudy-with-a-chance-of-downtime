@@ -145,7 +145,10 @@ function renderOperations(frame) {
   }).join('');
   const sources = Object.values(api.operations).map((source) => `<div class="ops-source"><span class="ops-source-dot ${source.state}"></span><div><strong>${source.label}</strong><small>${source.value} · ${source.detail}</small></div><em>${source.state === 'live' ? 'SOURCE' : source.state.toUpperCase()}</em></div>`);
   const weatherState = state.weatherStatus === 'live' ? 'live' : state.weatherStatus === 'stale' ? 'ready' : 'demo';
-  sources.push(`<div class="ops-source"><span class="ops-source-dot ${weatherState}"></span><div><strong>${state.weatherConditions?.source?.provider || 'Open-Meteo'} weather</strong><small>Wind, temperature, humidity · Iran hub stations</small></div><em>${state.weatherStatus.toUpperCase()}</em></div>`);
+  const weatherSources = state.weatherConditions?.sources || [{ provider: state.weatherConditions?.source?.provider || 'Open-Meteo', state: state.weatherStatus }];
+  weatherSources.forEach((source) => sources.push(`<div class="ops-source"><span class="ops-source-dot ${source.state === 'live' ? 'live' : source.state === 'unavailable' ? 'demo' : weatherState}"></span><div><strong>${escapeHtml(source.provider)} weather</strong><small>${source.state === 'live' ? 'Condition feed available · consensus participant' : escapeHtml(source.error || 'Waiting for provider credentials')}</small></div><em>${source.state.toUpperCase()}</em></div>`));
+  const consensus = state.weatherConditions?.warningConsensus;
+  if (consensus) sources.push(`<div class="ops-source"><span class="ops-source-dot ${consensus.active ? 'live' : 'ready'}"></span><div><strong>Warning consensus</strong><small>${consensus.votes.length} warning vote${consensus.votes.length === 1 ? '' : 's'} · ${consensus.clearVotes.length} clear vote${consensus.clearVotes.length === 1 ? '' : 's'} · ${consensus.unavailable.length} unavailable</small></div><em>${consensus.active ? 'WARN' : 'CLEAR'}</em></div>`);
   $('#ops-sources-list').innerHTML = sources.join('');
 }
 function narrative(frame) {
@@ -309,7 +312,19 @@ function applyWeatherConditions(payload) {
   if (!payload || !Array.isArray(payload.stations) || !payload.stations.length) throw new Error('Weather source returned no stations');
   state.weatherConditions = payload;
   state.weatherStatus = payload.status || 'fallback';
+  renderWeatherConsensus();
   render();
+}
+function renderWeatherConsensus() {
+  const box = $('#weather-consensus');
+  const consensus = state.weatherConditions?.warningConsensus || (state.weatherConditions && state.irimoWarnings.length ? { active: true, votes: ['IRIMO'], clearVotes: [], unavailable: ['OpenWeatherMap', 'WeatherAPI.com'], unsupported: ['Open-Meteo'], totalAvailable: 1 } : null);
+  if (!box) return;
+  if (!consensus) { box.innerHTML = '<b>Cross-source consensus</b><span>Waiting for provider votes…</span>'; return; }
+  const supporting = consensus.votes.length ? consensus.votes.join(', ') : 'none';
+  const dissenting = consensus.clearVotes.length ? consensus.clearVotes.join(', ') : 'none';
+  const unavailable = consensus.unavailable.length ? `Unavailable: ${consensus.unavailable.join(', ')}.` : '';
+  box.className = `weather-consensus ${consensus.active ? 'is-warning' : 'is-clear'}`;
+  box.innerHTML = `<b>${consensus.active ? 'CONSENSUS WARNING' : 'CONSENSUS CLEAR'}</b><span>${consensus.active ? `Warning supported by ${supporting}.` : `No warning supported by available alert sources.`} ${consensus.clearVotes.length ? `Clear/dissenting: ${dissenting}.` : ''} ${unavailable} Open-Meteo provides conditions, not official alert bulletins.</span>`;
 }
 async function loadWeatherConditions() {
   try {
@@ -326,7 +341,7 @@ async function loadWeatherConditions() {
       const response = await fetch(direct, { cache: 'no-store' });
       if (!response.ok) throw new Error(`Open-Meteo direct request returned ${response.status}`);
       const raw = await response.json(); const current = raw.current || {};
-      applyWeatherConditions({ status: 'live', fetchedAt: new Date().toISOString(), source: { provider: 'Open-Meteo', url: 'https://open-meteo.com/en/docs' }, stations: [{ id: 'tehran', name: 'Tehran', temperatureC: current.temperature_2m ?? null, humidity: current.relative_humidity_2m ?? null, weatherCode: current.weather_code ?? null, windKmh: current.wind_speed_10m ?? null, windGustKmh: current.wind_gusts_10m ?? null, windDirection: ['N','NE','E','SE','S','SW','W','NW'][Math.round(Number(current.wind_direction_10m || 0) / 45) % 8], observedAt: current.time || null }] });
+      applyWeatherConditions({ status: 'live', fetchedAt: new Date().toISOString(), source: { provider: 'Open-Meteo', url: 'https://open-meteo.com/en/docs' }, sources: [{ provider: 'Open-Meteo', state: 'live' }, { provider: 'OpenWeatherMap', state: 'unavailable', error: 'Server-side API key required' }, { provider: 'WeatherAPI.com', state: 'unavailable', error: 'Server-side API key required' }], stations: [{ id: 'tehran', name: 'Tehran', temperatureC: current.temperature_2m ?? null, humidity: current.relative_humidity_2m ?? null, weatherCode: current.weather_code ?? null, windKmh: current.wind_speed_10m ?? null, windGustKmh: current.wind_gusts_10m ?? null, windDirection: ['N','NE','E','SE','S','SW','W','NW'][Math.round(Number(current.wind_direction_10m || 0) / 45) % 8], observedAt: current.time || null }] });
       return;
     } catch (directError) {
       state.weatherStatus = 'demo';
@@ -363,6 +378,7 @@ function renderIrimoPayload(payload) {
     const list = $('#irimo-live-list'); const status = $('#irimo-feed-status');
     state.irimoWarnings = payload.warnings || [];
     state.irimoStatus = payload.status || 'fallback';
+    renderWeatherConsensus();
     $('#map-hud-warnings').textContent = `${state.irimoWarnings.length} IRIMO warnings`;
     $('#map-scope').textContent = `Iran · 31 provinces · demo telemetry · IRIMO ${state.irimoStatus} · 12 site clusters`;
     const mode = payload.status === 'live' ? 'LIVE' : payload.status === 'snapshot' ? 'SNAPSHOT' : payload.status === 'stale' ? 'STALE' : 'FALLBACK';

@@ -28,8 +28,8 @@ const provinceNames = new Map([
 export const weatherSourceCatalog = [
   { provider: "IRIMO", role: "official Iranian warnings", access: "HTML parser + scheduled snapshot", url: irimoWarningListUrl },
   { provider: "Open-Meteo", role: "live wind, temperature, humidity, and weather code", access: "public forecast API; no key for non-commercial use", url: "https://open-meteo.com/en/docs" },
-  { provider: "OpenWeatherMap", role: "production fallback and alerts", access: "API key required", url: "https://docs.openweather.co.uk/api/one-call-3" },
-  { provider: "WeatherAPI.com", role: "production fallback and historical weather", access: "API key required", url: "https://www.weatherapi.com/docs/" },
+  { provider: "OpenWeatherMap", role: "production corroboration and alerts", access: "API key required · set OPENWEATHER_API_KEY", url: "https://docs.openweather.co.uk/api/one-call-3" },
+  { provider: "WeatherAPI.com", role: "production corroboration and alerts", access: "API key required · set WEATHERAPI_KEY", url: "https://www.weatherapi.com/docs/" },
 ];
 
 const weatherStations = [
@@ -45,32 +45,108 @@ function windCompass(degrees) {
   const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
   return directions[Math.round(Number(degrees || 0) / 45) % directions.length];
 }
+function openMeteoCondition(code) {
+  if (code == null) return null; if (code >= 95) return "storm"; if (code >= 71) return "snow"; if (code >= 51) return "rain"; if (code >= 45) return "fog"; if (code >= 1) return "cloud"; return "clear";
+}
+function openWeatherCondition(code) {
+  if (code == null) return null; if (code >= 200 && code < 300) return "storm"; if (code >= 300 && code < 600) return "rain"; if (code >= 600 && code < 700) return "snow"; if (code >= 700 && code < 800) return "fog"; if (code === 800) return "clear"; return "cloud";
+}
+function weatherApiCondition(code) {
+  if (code == null) return null; if ([1087, 1273, 1276, 1279, 1282].includes(code)) return "storm"; if ([1066, 1114, 1117, 1210, 1213, 1216, 1219, 1222, 1225, 1255, 1258].includes(code)) return "snow"; if (code >= 1063 && code < 1070 || code >= 1150 && code < 1200 || code >= 1180 && code < 1250 || code >= 1240 && code < 1250) return "rain"; if ([1030, 1135, 1147].includes(code)) return "fog"; if (code === 1000) return "clear"; return "cloud";
+}
+
+async function fetchJson(url, options = {}) {
+  const response = await fetch(url, { ...options, signal: AbortSignal.timeout(8000) });
+  if (!response.ok) throw new Error(`${url.hostname || url} returned ${response.status}`);
+  return response.json();
+}
+
+function aggregateMetric(values, normalize) {
+  const votes = values.filter((item) => item.value != null).map((item) => ({ ...item, bucket: normalize(item.value) }));
+  if (!votes.length) return { value: null, votes: 0, total: 0, supporting: [], dissenting: [] };
+  const counts = new Map();
+  votes.forEach((vote) => counts.set(vote.bucket, (counts.get(vote.bucket) || 0) + 1));
+  const winner = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  const supporting = votes.filter((vote) => vote.bucket === winner).map((vote) => vote.provider);
+  const dissenting = votes.filter((vote) => vote.bucket !== winner).map((vote) => vote.provider);
+  const winnerValues = votes.filter((vote) => vote.bucket === winner).map((vote) => vote.value);
+  const numericValues = winnerValues.map(Number);
+  const value = winnerValues.every((item) => Number.isFinite(Number(item)))
+    ? numericValues.reduce((sum, item) => sum + item, 0) / numericValues.length
+    : winnerValues[0];
+  return { value, votes: supporting.length, total: votes.length, supporting, dissenting };
+}
+
+async function fetchOpenMeteo() {
+  const url = new URL("https://api.open-meteo.com/v1/forecast");
+  url.searchParams.set("latitude", weatherStations.map((station) => station.lat).join(","));
+  url.searchParams.set("longitude", weatherStations.map((station) => station.lon).join(","));
+  url.searchParams.set("current", "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m");
+  url.searchParams.set("timezone", "Asia/Tehran"); url.searchParams.set("forecast_days", "1");
+  const raw = await fetchJson(url, { headers: { "user-agent": "Network Weather MVP/1.0" } });
+  const records = Array.isArray(raw) ? raw : [raw];
+  return weatherStations.map((station, index) => {
+    const current = records[index]?.current || {};
+    return { ...station, temperatureC: current.temperature_2m ?? null, humidity: current.relative_humidity_2m ?? null, weatherCode: current.weather_code ?? null, weatherCondition: openMeteoCondition(current.weather_code), windKmh: current.wind_speed_10m ?? null, windGustKmh: current.wind_gusts_10m ?? null, windDirection: windCompass(current.wind_direction_10m), observedAt: current.time || null };
+  });
+}
+
+async function fetchOpenWeather() {
+  const key = process.env.OPENWEATHER_API_KEY;
+  if (!key) throw new Error("OPENWEATHER_API_KEY is not configured");
+  const results = await Promise.all(weatherStations.map(async (station) => {
+    const url = new URL("https://api.openweathermap.org/data/3.0/onecall");
+    url.searchParams.set("lat", station.lat); url.searchParams.set("lon", station.lon); url.searchParams.set("appid", key); url.searchParams.set("units", "metric"); url.searchParams.set("exclude", "minutely,daily");
+    const raw = await fetchJson(url);
+    return { ...station, temperatureC: raw.current?.temp ?? null, humidity: raw.current?.humidity ?? null, weatherCode: raw.current?.weather?.[0]?.id ?? null, weatherCondition: openWeatherCondition(raw.current?.weather?.[0]?.id), windKmh: raw.current?.wind_speed == null ? null : raw.current.wind_speed * 3.6, windGustKmh: raw.current?.wind_gust == null ? null : raw.current.wind_gust * 3.6, windDirection: windCompass(raw.current?.wind_deg), observedAt: raw.current?.dt ? new Date(raw.current.dt * 1000).toISOString() : null, alertsActive: Boolean(raw.alerts?.length) };
+  }));
+  return results;
+}
+
+async function fetchWeatherApi() {
+  const key = process.env.WEATHERAPI_KEY;
+  if (!key) throw new Error("WEATHERAPI_KEY is not configured");
+  const results = await Promise.all(weatherStations.map(async (station) => {
+    const url = new URL("https://api.weatherapi.com/v1/forecast.json");
+    url.searchParams.set("key", key); url.searchParams.set("q", `${station.lat},${station.lon}`); url.searchParams.set("days", "1"); url.searchParams.set("alerts", "yes");
+    const raw = await fetchJson(url);
+    const current = raw.current || {};
+    return { ...station, temperatureC: current.temp_c ?? null, humidity: current.humidity ?? null, weatherCode: current.condition?.code ?? null, weatherCondition: weatherApiCondition(current.condition?.code), windKmh: current.wind_kph ?? null, windGustKmh: current.gust_kph ?? null, windDirection: windCompass(current.wind_degree), observedAt: current.last_updated || null, alertsActive: Boolean(raw.alerts?.alert?.length) };
+  }));
+  return results;
+}
 
 export async function fetchWeatherConditions({ force = false } = {}) {
   const cacheAge = Date.now() - weatherConditionCache.fetchedAt;
   if (!force && weatherConditionCache.data && cacheAge < 5 * 60 * 1000) return weatherConditionCache.data;
-  try {
-    const url = new URL("https://api.open-meteo.com/v1/forecast");
-    url.searchParams.set("latitude", weatherStations.map((station) => station.lat).join(","));
-    url.searchParams.set("longitude", weatherStations.map((station) => station.lon).join(","));
-    url.searchParams.set("current", "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m");
-    url.searchParams.set("timezone", "Asia/Tehran");
-    url.searchParams.set("forecast_days", "1");
-    const response = await fetch(url, { headers: { "user-agent": "Network Weather MVP/1.0" }, signal: AbortSignal.timeout(8000) });
-    if (!response.ok) throw new Error(`Open-Meteo returned ${response.status}`);
-    const raw = await response.json();
-    const records = Array.isArray(raw) ? raw : [raw];
-    const stations = weatherStations.map((station, index) => {
-      const current = records[index]?.current || {};
-      return { ...station, temperatureC: current.temperature_2m ?? null, humidity: current.relative_humidity_2m ?? null, weatherCode: current.weather_code ?? null, windKmh: current.wind_speed_10m ?? null, windGustKmh: current.wind_gusts_10m ?? null, windDirection: windCompass(current.wind_direction_10m), observedAt: current.time || null };
-    });
-    const data = { status: "live", fetchedAt: new Date().toISOString(), source: { provider: "Open-Meteo", url: "https://open-meteo.com/en/docs" }, stations };
-    weatherConditionCache = { fetchedAt: Date.now(), data };
-    return data;
-  } catch (error) {
-    if (weatherConditionCache.data) return { ...weatherConditionCache.data, status: "stale", error: "Open-Meteo refresh failed; showing the last successful fetch." };
-    return { status: "fallback", fetchedAt: new Date().toISOString(), source: { provider: "Open-Meteo", url: "https://open-meteo.com/en/docs" }, stations: [], error: error.message };
-  }
+  const providerFns = [["Open-Meteo", fetchOpenMeteo], ["OpenWeatherMap", fetchOpenWeather], ["WeatherAPI.com", fetchWeatherApi]];
+  const results = await Promise.all(providerFns.map(async ([provider, fetcher]) => {
+    try { return { provider, state: "live", stations: await fetcher() }; }
+    catch (error) { return { provider, state: "unavailable", error: error.message, stations: [] }; }
+  }));
+  const liveResults = results.filter((result) => result.state === "live");
+  const stations = weatherStations.map((station) => {
+    const values = (key) => liveResults.map((result) => ({ provider: result.provider, value: result.stations.find((item) => item.id === station.id)?.[key] }));
+    const temperature = aggregateMetric(values("temperatureC"), (value) => Math.round(value));
+    const humidity = aggregateMetric(values("humidity"), (value) => Math.round(value / 5) * 5);
+    const wind = aggregateMetric(values("windKmh"), (value) => Math.round(value));
+    const gust = aggregateMetric(values("windGustKmh"), (value) => Math.round(value));
+    const direction = aggregateMetric(values("windDirection"), (value) => value);
+    const condition = aggregateMetric(values("weatherCondition"), (value) => value);
+    const primary = liveResults.find((result) => result.provider === "Open-Meteo")?.stations.find((item) => item.id === station.id) || {};
+    return { ...station, temperatureC: temperature.value == null ? null : Number(temperature.value.toFixed(1)), humidity: humidity.value == null ? null : Math.round(humidity.value), weatherCondition: condition.value || primary.weatherCondition || null, windKmh: wind.value == null ? null : Number(wind.value.toFixed(1)), windGustKmh: gust.value == null ? null : Number(gust.value.toFixed(1)), windDirection: direction.value || primary.windDirection || "N", observedAt: primary.observedAt || null, agreement: { temperature, humidity, condition, wind, gust, direction } };
+  });
+  let irimo = { status: "unavailable", warnings: [] };
+  try { irimo = await fetchIrimoWarnings(); } catch { /* the warning endpoint already returns a safe fallback */ }
+  const warningVotes = [
+    { provider: "IRIMO", state: irimo.warnings?.length ? "warning" : "clear", detail: "official bulletin" },
+    ...results.filter((result) => result.provider !== "Open-Meteo").map((result) => { const hasAlert = result.stations.some((station) => station.alertsActive); return { provider: result.provider, state: result.state === "live" ? (hasAlert ? "warning" : "clear") : "unavailable", detail: result.error || "alerts endpoint" }; }),
+  ];
+  const availableWarningVotes = warningVotes.filter((vote) => ["warning", "clear"].includes(vote.state));
+  const warningActive = availableWarningVotes.filter((vote) => vote.state === "warning").length >= Math.ceil(availableWarningVotes.length / 2);
+  const data = { status: liveResults.length ? "live" : "fallback", fetchedAt: new Date().toISOString(), source: { provider: liveResults.map((result) => result.provider).join(" + ") || "No live weather source", url: "https://open-meteo.com/en/docs" }, sources: results.map(({ provider, state, error }) => ({ provider, state, error: error || null })), stations, warningConsensus: { active: warningActive, votes: availableWarningVotes.filter((vote) => vote.state === "warning").map((vote) => vote.provider), clearVotes: availableWarningVotes.filter((vote) => vote.state === "clear").map((vote) => vote.provider), unavailable: warningVotes.filter((vote) => vote.state === "unavailable").map((vote) => vote.provider), unsupported: ["Open-Meteo"], totalAvailable: availableWarningVotes.length } };
+  if (liveResults.length) weatherConditionCache = { fetchedAt: Date.now(), data };
+  return data;
 }
 
 function requestIrimoHtml(targetUrl = irimoWarningListUrl) {

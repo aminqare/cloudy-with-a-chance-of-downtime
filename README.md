@@ -54,7 +54,18 @@ flowchart LR
     G --> H
 ```
 
-The MVP uses deterministic telecom fixture data so every presentation tells the same story. IRIMO weather warnings are fetched and parsed separately, then associated with provinces and cities when location names are available.
+The MVP uses deterministic telecom fixture data so every presentation tells the same story. IRIMO weather warnings are fetched and parsed separately, then associated with provinces and cities when location names are available. Live wind and condition data is corroborated through Open-Meteo, with optional OpenWeatherMap and WeatherAPI.com adapters.
+
+### Weather source consensus
+
+The server keeps provider credentials private and aggregates provider votes before the dashboard uses them:
+
+- IRIMO is the official Iranian warning source.
+- Open-Meteo provides live wind, gusts, temperature, humidity, and condition data without a key.
+- OpenWeatherMap and WeatherAPI.com can be enabled with `OPENWEATHER_API_KEY` and `WEATHERAPI_KEY` in the server environment.
+- Numeric conditions use the majority bucket. Warning decisions show the supporting providers, clear/dissenting providers, and unavailable providers separately.
+
+Copy `.env.example` into the server environment and add the optional provider keys when available. Never put those keys in browser JavaScript or GitHub Pages assets.
 
 No production NMS/OSS connector or customer telemetry is included.
 
