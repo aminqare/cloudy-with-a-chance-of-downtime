@@ -2,9 +2,9 @@
 
 > **Tonight’s forecast:** 91% utilization, scattered packet loss, and a strong chance someone asks, “Is it the network?”
 
-**Cloudy with a Chance of Downtime** is a customer-experience forecast disguised as a live TV weather broadcast. It combines provider-backed weather with an LDP-inspired model of radio demand and traffic to show where mobile service may feel great, good, busy, or limited across Iran.
+**Cloudy with a Chance of Downtime** is an operator weather desk disguised as a live TV weather broadcast. It combines provider-backed weather with an LDP-inspired model of radio demand and traffic to show where mobile service may feel great, good, busy, or limited across Iran—and what the operator should do next.
 
-The result is a friendly dashboard that explains mobile experience the way a weather anchor explains the day: what it feels like now, where conditions may change, and when they should improve.
+The result is an operational dashboard that explains mobile experience the way a weather anchor explains the day: what it feels like now, where conditions may change, who owns the response, and when the next decision is due.
 
 ```text
   CURRENT CONDITIONS        TONIGHT                  OUTLOOK
@@ -15,6 +15,9 @@ The result is a friendly dashboard that explains mobile experience the way a wea
 ## What’s on the radar?
 
 - 🗺️ **Iran customer-experience map** with all 31 provinces and major cities
+- 🎛️ **Operator shift bar** for source freshness, open priorities, and potential customer impact
+- 🚨 **Prioritized action queue** with owner, response target, recommended action, and local acknowledgement state
+- 🔗 **Synchronized workflow** connecting queue rows, map markers, and regional detail
 - 🙂 **Plain-language service outlook** showing great, good, busy, and limited areas
 - 📶 **LDP-inspired demand and speed views** that translate RRC and TRP into what customers may feel
 - 🧭 **Regional cards** for expected experience, typical speed, availability, and people who may notice a change

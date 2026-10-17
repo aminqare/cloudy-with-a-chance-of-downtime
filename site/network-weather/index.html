@@ -4,18 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#090b0a" />
-  <title>Network Weather · Customer Experience Forecast</title>
+  <title>Network Weather · Operator Weather Desk</title>
   <link rel="stylesheet" href="./styles.css?v=20261017-6" />
   <link rel="stylesheet" href="./ticker.css?v=20261016-1" />
   <link rel="stylesheet" href="./carrier-theme.css?v=20261016-5" />
   <link rel="stylesheet" href="./viewport-fix.css?v=20261017-6" />
-  <link rel="stylesheet" href="./customer-experience.css?v=20261017-1" />
+  <link rel="stylesheet" href="./customer-experience.css?v=20261017-2" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div class="brand"><span class="brand-mark">NW</span><div><strong>NETWORK WEATHER</strong><small>Customer experience forecast</small></div></div>
-      <div class="topbar-actions"><span class="live-dot"><i></i> WEATHER LIVE · NETWORK DEMO</span><button class="ghost-btn" id="presenter-btn" aria-pressed="false">TV mode</button><button class="ghost-btn" id="fullscreen-btn">Fullscreen</button><button class="ghost-btn" id="motion-btn" aria-pressed="false">Reduce motion</button></div>
+      <div class="brand"><span class="brand-mark">NW</span><div><strong>NETWORK WEATHER</strong><small>Operator weather desk</small></div></div>
+      <div class="topbar-actions"><span class="live-dot"><i></i> SHIFT ACTIVE · WEATHER LIVE</span><button class="ghost-btn" id="presenter-btn" aria-pressed="false">TV mode</button><button class="ghost-btn" id="fullscreen-btn">Fullscreen</button><button class="ghost-btn" id="motion-btn" aria-pressed="false">Reduce motion</button></div>
     </header>
 
     <main>
@@ -26,11 +26,25 @@
       <div class="ticker-bar" role="status" aria-live="polite"><strong>CUSTOMER EXPERIENCE BULLETIN</strong><span id="ticker-text">Most customers should see normal service · Demand rises toward the evening peak · Weather warnings are shown on the map</span></div>
       <div class="broadcast-crawl" aria-label="Broadcast summary"><span><b>NOW</b><strong id="broadcast-now">Observed · 14:00 IRST</strong></span><span><b>NEXT</b><strong id="broadcast-next">Demand rises · 18:00 IRST</strong></span><span><b>WATCH</b><strong id="broadcast-risk">Weather and busy areas</strong></span><span><b>SOURCES</b><strong id="broadcast-source">Live weather · Demonstration network data</strong></span></div>
 
+      <section class="operator-status" id="operator-status" aria-label="Current operator shift status"></section>
+
       <section class="customer-pulse" id="customer-pulse" aria-label="Customer experience snapshot"></section>
 
       <section class="customer-intro panel" aria-label="Customer experience outlook">
-        <div><span class="section-kicker">TODAY'S SERVICE OUTLOOK</span><h2>Mobile service, explained like weather</h2><p>Live weather sits beside an LDP-inspired model of radio demand and traffic. The result is a simple forecast of what customers may feel—not a wall of network alarms.</p></div>
+        <div><span class="section-kicker">OPERATOR WEATHER DESK</span><h2>See impact, decide, acknowledge</h2><p>Provider-backed weather sits beside LDP-inspired radio demand and traffic. Use the queue for action; use the map for context; open network detail only when diagnosis needs it.</p></div>
         <div class="experience-scale"><span class="excellent"><i></i> Great</span><span class="good"><i></i> Good</span><span class="busy"><i></i> Busy</span><span class="limited"><i></i> Limited</span></div>
+      </section>
+
+      <section class="operator-console" aria-label="Operator action console">
+        <article class="panel priority-panel">
+          <div class="panel-heading"><div><span class="section-kicker">PRIORITY QUEUE</span><h2>What needs attention now</h2></div><div class="queue-filters" role="group" aria-label="Priority queue filter"><button class="queue-filter active" data-queue-filter="open">Open</button><button class="queue-filter" data-queue-filter="all">All</button><button class="queue-filter" data-queue-filter="weather">Weather</button></div></div>
+          <div class="operator-queue" id="operator-queue" aria-live="polite"></div>
+        </article>
+        <aside class="panel handover-panel">
+          <div class="panel-heading compact"><div><span class="section-kicker">SHIFT HANDOVER</span><h2>Next 60 minutes</h2></div><span class="shift-health">CONTROLLED</span></div>
+          <div id="shift-handover"></div>
+          <div class="handover-actions"><button id="show-risk-btn">Show risk on map</button><button id="open-network-btn">Open network detail</button></div>
+        </aside>
       </section>
 
       <section class="broadcast-grid">
@@ -89,8 +103,8 @@
     <footer class="footer"><span>Network Weather · Customer-experience and LDP-style network values are sanitized mock data</span><span>Weather and IRIMO are provider-backed and labeled by freshness</span></footer>
   </div>
   <script src="./data.js?v=20261016-1"></script>
-  <script src="./customer-experience-data.js?v=20261017-1"></script>
+  <script src="./customer-experience-data.js?v=20261017-2"></script>
   <script src="./app.js?v=20261017-13"></script>
-  <script src="./customer-experience.js?v=20261017-1"></script>
+  <script src="./customer-experience.js?v=20261017-2"></script>
 </body>
 </html>

@@ -6,7 +6,29 @@
   const formatNumber = (value) => new Intl.NumberFormat('en-US').format(value);
   const labels = { excellent:'Great', good:'Good', busy:'Busy', limited:'Limited' };
   const modeLabels = { weather:'Live weather', experience:'Customer experience', demand:'Demand', speed:'Speed' };
-  const customerState = { mode:'weather', selected:'Tehran' };
+  const customerState = { mode:'weather', selected:'Tehran', queueFilter:'open', acknowledged:new Set() };
+  try { customerState.acknowledged = new Set(JSON.parse(localStorage.getItem('network-weather-operator-ack') || '[]')); } catch { customerState.acknowledged = new Set(); }
+
+  const priorityScore = (region) => region.impacted + region.demand * 12 + (region.status === 'limited' ? 2200 : region.status === 'busy' ? 900 : 0);
+  const priorityRegions = () => [...data.regions].sort((a, b) => priorityScore(b) - priorityScore(a));
+  const openPriorityRegions = () => priorityRegions().filter((region) => ['limited','busy'].includes(region.status) && !customerState.acknowledged.has(region.city));
+
+  function renderOperatorStatus() {
+    const target = $('#operator-status');
+    if (!target) return;
+    const open = openPriorityRegions();
+    const impacted = data.regions.reduce((sum, region) => sum + region.impacted, 0);
+    const irimo = $('#irimo-feed-status')?.textContent || 'Updating';
+    const weatherState = /LIVE/.test(irimo) ? 'Live' : /SNAPSHOT/.test(irimo) ? 'Snapshot' : 'Updating';
+    const items = [
+      ['Shift status','Active','Operator desk online','healthy'],
+      ['Open priorities',String(open.length),open.length ? `${open[0].city} is first` : 'Queue controlled',open.length ? 'watch' : 'healthy'],
+      ['Potential impact',formatNumber(impacted),'People in demo model','watch'],
+      ['Weather evidence',weatherState,'IRIMO + 6 stations','healthy'],
+      ['Network evidence','Mock','LDP-inspired RRC / TRP','mock'],
+    ];
+    target.innerHTML = items.map(([label,value,detail,stateName]) => `<article class="operator-status-card ${stateName}"><i></i><span><small>${label}</small><b>${value}</b><em>${detail}</em></span></article>`).join('');
+  }
 
   function renderPulse() {
     const target = $('#customer-pulse');
@@ -44,6 +66,45 @@
     if (detail) detail.innerHTML = `<p class="region-outlook">${region.outlook}</p><div class="region-metrics"><span><b>${region.goodExperience}%</b><small>good experience</small></span><span><b>${region.speed} Mbps</b><small>typical demo speed</small></span><span><b>${region.demand}%</b><small>radio demand</small></span><span><b>${region.availability}%</b><small>availability</small></span></div><div class="region-weather"><i>☀</i><span><b>${region.weather}</b><small>${region.impacted ? `${formatNumber(region.impacted)} people may notice a change` : 'No meaningful customer impact expected'}</small></span></div><details><summary>Network terms</summary><p>Demand is modeled from RRC occupancy. Speed is modeled from TRP traffic. Both are sanitized demonstration values inspired by LDP—not live customer records.</p></details>`;
     $$('.experience-marker').forEach((marker) => marker.classList.toggle('selected', marker.dataset.city === region.city));
     $$('.outlook-row').forEach((row) => row.classList.toggle('selected', row.dataset.city === region.city));
+    $$('.operator-queue-row').forEach((row) => row.classList.toggle('selected', row.dataset.city === region.city));
+  }
+
+  function selectOperatorRegion(city, focusMap = false) {
+    customerState.mode = 'experience';
+    $$('[data-experience-layer]').forEach((item) => item.classList.toggle('active', item.dataset.experienceLayer === 'experience'));
+    renderMap();
+    renderDetail(city);
+    if (focusMap) $('#map-canvas')?.scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+
+  function persistAcknowledgements() {
+    try { localStorage.setItem('network-weather-operator-ack', JSON.stringify([...customerState.acknowledged])); } catch { /* optional demo persistence */ }
+  }
+
+  function renderQueue() {
+    const target = $('#operator-queue');
+    if (!target) return;
+    const rows = priorityRegions().filter((region) => customerState.queueFilter === 'all' || (customerState.queueFilter === 'weather' ? /weather|wind/i.test(`${region.cause} ${region.weather}`) : !customerState.acknowledged.has(region.city))).slice(0, 6);
+    target.innerHTML = rows.map((region, index) => {
+      const acknowledged = customerState.acknowledged.has(region.city);
+      return `<article class="operator-queue-row ${region.status} ${acknowledged ? 'acknowledged' : ''}" data-city="${region.city}"><button class="queue-main" data-operator-city="${region.city}"><span class="queue-rank">${String(index + 1).padStart(2,'0')}</span><span class="queue-place"><b>${region.city}</b><small>${region.cause} · ${region.owner}</small></span><span class="queue-impact"><b>${formatNumber(region.impacted)}</b><small>may notice impact</small></span><span class="queue-action"><b>${region.action}</b><small>Target response · ${region.sla}</small></span></button><button class="queue-ack" data-ack-city="${region.city}" aria-pressed="${acknowledged}">${acknowledged ? 'Reopen' : 'Acknowledge'}</button></article>`;
+    }).join('') || '<div class="queue-empty"><b>Queue controlled</b><span>No open priorities match this filter.</span></div>';
+    $$('[data-operator-city]').forEach((button) => button.addEventListener('click', () => selectOperatorRegion(button.dataset.operatorCity, true)));
+    $$('[data-ack-city]').forEach((button) => button.addEventListener('click', () => {
+      const city = button.dataset.ackCity;
+      if (customerState.acknowledged.has(city)) customerState.acknowledged.delete(city); else customerState.acknowledged.add(city);
+      persistAcknowledgements();
+      renderQueue(); renderOperatorStatus(); renderHandover(); renderDetail();
+    }));
+    renderDetail();
+  }
+
+  function renderHandover() {
+    const target = $('#shift-handover');
+    if (!target) return;
+    const top = openPriorityRegions()[0] || priorityRegions()[0];
+    const open = openPriorityRegions();
+    target.innerHTML = `<div class="handover-lead"><span>NEXT DECISION</span><b>${open.length ? `${top.city} · ${top.sla}` : 'Queue controlled'}</b><p>${open.length ? top.action : 'Continue weather and demand observation.'}</p></div><div class="handover-grid"><span><small>Peak window</small><b>18:00–21:00</b></span><span><small>Primary signal</small><b>${top.demand}% demand</b></span><span><small>Weather watch</small><b>${top.weather}</b></span><span><small>Owner</small><b>${top.owner}</b></span></div><div class="handover-note"><i></i><span><b>Shift note</b><small>${open.length} unacknowledged priorit${open.length === 1 ? 'y' : 'ies'} · next forecast review in 15 minutes</small></span></div>`;
   }
 
   function renderOutlook() {
@@ -86,12 +147,27 @@
       $$('[data-experience-layer]').forEach((item) => item.classList.toggle('active', item === button));
       renderMap();
     }));
+    $$('[data-queue-filter]').forEach((button) => button.addEventListener('click', () => {
+      customerState.queueFilter = button.dataset.queueFilter;
+      $$('[data-queue-filter]').forEach((item) => item.classList.toggle('active', item === button));
+      renderQueue();
+    }));
+    $('#show-risk-btn')?.addEventListener('click', () => selectOperatorRegion((openPriorityRegions()[0] || priorityRegions()[0]).city, true));
+    $('#open-network-btn')?.addEventListener('click', () => {
+      const details = $('.technical-details');
+      if (details) { details.open = true; details.scrollIntoView({ behavior:'smooth', block:'start' }); }
+    });
   }
 
+  renderOperatorStatus();
   renderPulse();
   renderOutlook();
+  renderQueue();
+  renderHandover();
   bindControls();
   renderDetail();
+  const sourceStatus = $('#irimo-feed-status');
+  if (sourceStatus) new MutationObserver(renderOperatorStatus).observe(sourceStatus, { childList:true, characterData:true, subtree:true });
   let attempts = 0;
   const timer = setInterval(() => { attempts += 1; if (renderMap() || attempts > 40) clearInterval(timer); }, 180);
 })();
