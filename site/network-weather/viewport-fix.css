@@ -19,7 +19,7 @@ main { min-width: 0; }
 .weather-consensus span { color: #5e625a; }
 .weather-consensus.is-warning { border-left-color: #d82f3f; }
 .weather-consensus.is-clear { border-left-color: #007a58; }
-.live-station-card { position: absolute; z-index: 6; display: grid; gap: 2px; width: 92px; padding: 7px 8px; transform: translate(-50%, -50%); border: 1px solid rgba(0,122,88,.42); border-radius: 5px; background: rgba(255,250,240,.94); color: #20231e; box-shadow: 3px 4px 0 rgba(0,0,0,.16), 0 0 0 2px rgba(255,250,240,.18); text-align: left; cursor: pointer; }
+.live-station-card { position: absolute; z-index: 6; display: grid; gap: 2px; width: 92px; padding: 7px 8px; transform: translate(-50%, -50%); border: 1px solid rgba(0,122,88,.42); border-radius: 5px; background: rgba(255,250,240,.94); color: #20231e; box-shadow: 3px 4px 0 rgba(0,0,0,.16), 0 0 0 2px rgba(255,250,240,.18); text-align: left; cursor: pointer; transition: transform .32s cubic-bezier(.22,.61,.36,1), box-shadow .32s ease, border-color .32s ease; }
 .live-station-card:hover, .live-station-card:focus-visible { z-index: 12; transform: translate(-50%, -50%) scale(1.08); outline: 2px solid #d89a00; }
 .live-station-head { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
 .live-station-head b { overflow: hidden; font-size: 8px; letter-spacing: .06em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
@@ -33,6 +33,15 @@ main { min-width: 0; }
 .live-station-card.live-storm { border-color: #b22a3d; }
 .live-station-card.live-storm .live-station-head i { color: #b22a3d; }
 .live-station-card.live-snow { border-color: #8d6b2d; }
+.live-station-card.live-clear .live-station-head svg { animation: stationSun 18s linear infinite; transform-box: fill-box; transform-origin: center; }
+.live-station-card.live-cloud .live-station-head svg { animation: stationCloud 4.8s ease-in-out infinite; }
+.live-station-card.live-rain .live-station-head svg .accent { stroke-dasharray: 2 3; animation: stationRain 1.4s linear infinite; }
+.live-station-card.live-storm .live-station-head svg .accent { animation: stationFlash 2.7s ease-in-out infinite; }
+@keyframes stationSun { to { transform: rotate(360deg); } }
+@keyframes stationCloud { 0%,100% { transform: translateX(-1px); } 50% { transform: translateX(1px); } }
+@keyframes stationRain { to { stroke-dashoffset: -10; } }
+@keyframes stationFlash { 0%,78%,100% { opacity: .62; } 82%,88% { opacity: 1; } 85% { opacity: .2; } }
+@media (prefers-reduced-motion: reduce) { .live-station-card, .live-station-head svg, .live-station-head svg .accent { animation: none !important; transition-duration: .001ms !important; } }
 @media (max-width: 760px) {
   .live-station-card { width: 72px; padding: 5px 6px; }
   .live-station-head b { font-size: 6px; }

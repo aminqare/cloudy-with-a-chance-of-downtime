@@ -120,7 +120,7 @@ function render() {
   const wind = liveTehran?.windKmh != null
     ? [liveTehran.windDirection, Math.round(liveTehran.windKmh), liveTehran.windGustKmh]
     : frame.state === 'storm' ? ['SW', 32] : frame.state === 'rain' ? ['W', 24] : frame.state === 'cloud' ? ['NW', 17] : ['N', 11];
-  ensureBroadcastWeather(); $('#map-hud-wind').textContent = `Wind ${wind[0]} ${wind[1]} km/h${wind[2] != null ? ` · gust ${Math.round(wind[2])}` : ''}`;
+  ensureBroadcastWeather(); updateWeatherMotion(wind[0], wind[1], frame.state); $('#map-hud-wind').textContent = `Wind ${wind[0]} ${wind[1]} km/h${wind[2] != null ? ` · gust ${Math.round(wind[2])}` : ''}`;
   $('#map-canvas').dataset.weather = frame.state;
 }
 
@@ -216,13 +216,30 @@ function weatherIcon(condition) {
   if (condition === 'partly') return `<svg ${common}><circle class="accent" cx="8" cy="8" r="3"/><path d="M7.5 17h8.2a4 4 0 0 0 .3-8 5.5 5.5 0 0 0-10.3 1.7A3.3 3.3 0 0 0 7.5 17Z"/></svg>`;
   return `<svg ${common}><circle cx="12" cy="12" r="4"/><path class="accent" d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9 7 7m10 10 2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg>`;
 }
+function updateWeatherMotion(direction = 'N', windKmh = 11, condition = 'clear') {
+  const layer = $('#broadcast-weather-layer'); if (!layer) return;
+  const bearings = { N:0, NNE:22.5, NE:45, ENE:67.5, E:90, ESE:112.5, SE:135, SSE:157.5, S:180, SSW:202.5, SW:225, WSW:247.5, W:270, WNW:292.5, NW:315, NNW:337.5 };
+  const fromBearing = bearings[String(direction || 'N').toUpperCase()] ?? 0;
+  const travelAngle = (fromBearing + 90) % 360;
+  const speed = Math.max(0, Math.min(90, Number(windKmh) || 0));
+  const distance = Math.max(7, Math.min(30, 6 + speed * .55));
+  const radians = travelAngle * Math.PI / 180;
+  const driftX = Math.cos(radians) * distance; const driftY = Math.sin(radians) * distance;
+  layer.style.setProperty('--wind-angle', `${travelAngle}deg`);
+  layer.style.setProperty('--wind-duration', `${Math.max(2.8, Math.min(10, 11 - speed * .18)).toFixed(2)}s`);
+  layer.style.setProperty('--cell-duration', `${Math.max(6, Math.min(13, 14 - speed * .16)).toFixed(2)}s`);
+  layer.style.setProperty('--front-duration', `${Math.max(5, Math.min(14, 15 - speed * .2)).toFixed(2)}s`);
+  layer.style.setProperty('--drift-x', `${driftX.toFixed(1)}px`); layer.style.setProperty('--drift-y', `${driftY.toFixed(1)}px`);
+  layer.style.setProperty('--drift-start-x', `${(-driftX * .35).toFixed(1)}px`); layer.style.setProperty('--drift-start-y', `${(-driftY * .35).toFixed(1)}px`);
+  layer.dataset.intensity = condition;
+}
 function ensureBroadcastWeather() {
   if ($('#broadcast-weather-layer')) return;
   const windReadout = document.createElement('span'); windReadout.id = 'map-hud-wind'; windReadout.textContent = 'Wind N 11 km/h';
   $('#map-hud-warnings').before(windReadout);
   const layer = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   layer.id = 'broadcast-weather-layer'; layer.setAttribute('class', 'broadcast-weather-layer'); layer.setAttribute('viewBox', '0 0 760 500'); layer.setAttribute('preserveAspectRatio', 'none'); layer.setAttribute('aria-hidden', 'true');
-  layer.innerHTML = `<defs><clipPath id="iran-weather-clip"><path d="M106 148 146 126 181 132 209 112 255 119 281 100 325 112 358 96 402 111 436 105 472 127 505 132 534 157 572 175 594 207 581 233 603 261 592 292 614 317 596 349 561 354 541 384 503 391 477 421 438 411 405 435 370 423 343 403 309 414 280 392 244 397 220 369 184 356 168 322 141 301 151 270 128 237 145 208 123 181Z"/></clipPath><radialGradient id="radar-green"><stop offset="0" stop-color="#69e69e" stop-opacity=".72"/><stop offset=".55" stop-color="#2bcf9a" stop-opacity=".34"/><stop offset="1" stop-color="#2bcf9a" stop-opacity="0"/></radialGradient><radialGradient id="radar-heavy"><stop offset="0" stop-color="#ff6a65" stop-opacity=".8"/><stop offset=".3" stop-color="#ffcb55" stop-opacity=".64"/><stop offset=".68" stop-color="#43d29a" stop-opacity=".32"/><stop offset="1" stop-color="#43d29a" stop-opacity="0"/></radialGradient><marker id="wind-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#c9f7ff"/></marker></defs><g clip-path="url(#iran-weather-clip)"><ellipse class="radar-cell cell-west" cx="205" cy="235" rx="112" ry="86"/><ellipse class="radar-cell cell-east" cx="520" cy="245" rx="128" ry="108"/><ellipse class="radar-cell cell-south" cx="390" cy="390" rx="105" ry="75"/><path class="weather-front" d="M125 330 C220 272 264 325 350 259 S503 240 605 167"/><g class="wind-vectors"><path d="M135 195 C190 165 237 171 283 151"/><path d="M196 292 C257 263 315 270 367 232"/><path d="M333 353 C396 316 450 330 511 283"/><path d="M454 191 C510 170 550 183 592 153"/></g></g>`;
+  layer.innerHTML = `<defs><clipPath id="iran-weather-clip"><path d="M106 148 146 126 181 132 209 112 255 119 281 100 325 112 358 96 402 111 436 105 472 127 505 132 534 157 572 175 594 207 581 233 603 261 592 292 614 317 596 349 561 354 541 384 503 391 477 421 438 411 405 435 370 423 343 403 309 414 280 392 244 397 220 369 184 356 168 322 141 301 151 270 128 237 145 208 123 181Z"/></clipPath><radialGradient id="radar-green"><stop offset="0" stop-color="#69e69e" stop-opacity=".72"/><stop offset=".55" stop-color="#2bcf9a" stop-opacity=".34"/><stop offset="1" stop-color="#2bcf9a" stop-opacity="0"/></radialGradient><radialGradient id="radar-heavy"><stop offset="0" stop-color="#ff6a65" stop-opacity=".8"/><stop offset=".3" stop-color="#ffcb55" stop-opacity=".64"/><stop offset=".68" stop-color="#43d29a" stop-opacity=".32"/><stop offset="1" stop-color="#43d29a" stop-opacity="0"/></radialGradient><marker id="wind-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#fffaf0"/></marker></defs><g clip-path="url(#iran-weather-clip)"><g class="radar-cells"><ellipse class="radar-cell cell-west" cx="205" cy="235" rx="112" ry="86"/><ellipse class="radar-cell cell-east" cx="520" cy="245" rx="128" ry="108"/><ellipse class="radar-cell cell-south" cx="390" cy="390" rx="105" ry="75"/></g><path class="weather-front" d="M125 330 C220 272 264 325 350 259 S503 240 605 167"/><g class="wind-vectors"><path d="M115 175 C175 169 230 181 290 175"/><path d="M180 280 C245 270 305 291 370 280"/><path d="M320 365 C385 354 449 376 520 365"/><path d="M430 205 C490 196 548 214 610 205"/></g></g>`;
   $('.country-glow').after(layer);
 }
 function renderMapLegend() {
