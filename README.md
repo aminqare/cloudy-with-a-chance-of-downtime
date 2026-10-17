@@ -2,9 +2,9 @@
 
 > **Tonight’s forecast:** 91% utilization, scattered packet loss, and a strong chance someone asks, “Is it the network?”
 
-**Cloudy with a Chance of Downtime** is a national telecom command center disguised as a live TV weather broadcast. It fuses radio capacity, subscribers, transmission topology, core resources, EHS readiness, incidents and real weather into one management view across Iran.
+**Cloudy with a Chance of Downtime** is a customer-experience forecast disguised as a live TV weather broadcast. It combines provider-backed weather with an LDP-inspired model of radio demand and traffic to show where mobile service may feel great, good, busy, or limited across Iran.
 
-The result is a presenter-friendly dashboard that lets a NOC team explain network conditions like a weather anchor explains an approaching storm.
+The result is a friendly dashboard that explains mobile experience the way a weather anchor explains the day: what it feels like now, where conditions may change, and when they should improve.
 
 ```text
   CURRENT CONDITIONS        TONIGHT                  OUTLOOK
@@ -14,20 +14,17 @@ The result is a presenter-friendly dashboard that lets a NOC team explain networ
 
 ## What’s on the radar?
 
-- 🗺️ **Iran operations map** with all 31 provinces and major cities
-- 🧠 **Executive fusion queue** correlating radio, transport, core, subscribers, EHS and weather into recommended actions
-- 📶 **LDP-modeled RRC/TRP views** for FDD, TDD and 5G occupancy, allocation pressure and throughput
-- 🕸️ **TxTopoli-modeled transport views** for fiber/microwave links, protection, capacity, alarms, distance and loss
-- 🧬 **MonRes-modeled CTO views** for Core PS, Core CS, IP, wireless/IMS, CPU, licenses, trunks and subscriber capacity
-- 🦺 **EHS-modeled readiness views** for incidents, audits, PPE and corrective actions
-- 🎯 **360° site digital twin** joining location, radio, subscribers, TX path, core dependency, EHS and weather exposure
+- 🗺️ **Iran customer-experience map** with all 31 provinces and major cities
+- 🙂 **Plain-language service outlook** showing great, good, busy, and limited areas
+- 📶 **LDP-inspired demand and speed views** that translate RRC and TRP into what customers may feel
+- 🧭 **Regional cards** for expected experience, typical speed, availability, and people who may notice a change
 - 🌦️ **Broadcast weather graphics** with animated fronts, radar cells, wind vectors, and provincial conditions
-- 📡 **Telecom layers** for traffic, congestion, latency, coverage, incidents, maintenance, and technology
+- 📡 **Four focused map modes** for live weather, customer experience, demand, and speed
 - ⚠️ **IRIMO warning integration** that parses official warnings and maps affected provinces
 - ⏱️ **Time machine** for observed history, forecasts, playback, and severe-condition scenarios
-- 📊 **Synchronized KPIs** covering availability, utilization, throughput, packet loss, and signal quality
-- 🎙️ **Presenter mode** with story beats, headlines, ticker updates, and an operational briefing
-- 🧑‍💻 **Audience views** for executives, NOC operators, and engineers
+- 📊 **Optional network details** for availability, RRC-style utilization, TRP-style throughput, packet loss, and signal quality
+- 🎙️ **TV mode** with story beats, headlines, ticker updates, and a customer-friendly briefing
+- 🧑‍💻 **Progressive detail** from customer language to service and network views
 - ♿ **Accessible controls** with keyboard navigation, visible focus, and reduced-motion support
 
 ## See the storm
@@ -49,25 +46,23 @@ For maximum drama, select **Tonight**, switch to **Conditions**, and turn on **P
 
 ```mermaid
 flowchart LR
-    A[Demo telecom telemetry] --> D[Network Weather API]
+    A[LDP-inspired demo telemetry] --> D[Network Weather API]
     B[IRIMO warning parser] --> D
     C[Province and city GeoJSON] --> E[Broadcast map]
     D --> E
-    D --> F[KPIs and alerts]
+    D --> F[Customer experience and warnings]
     D --> G[Timeline and story mode]
-    E --> H[Operations forecast]
+    E --> H[Customer experience forecast]
     F --> H
     G --> H
 ```
 
-The public demo uses deterministic, sanitized mock telecom data modeled on the schemas and operating concepts of the local LDP, TxTopoli, MonRes and EHS platforms. It does not copy or publish their production records. IRIMO weather warnings are fetched and parsed separately, then associated with provinces and cities when location names are available. Live wind and condition data is corroborated through Open-Meteo, with optional OpenWeatherMap and WeatherAPI.com adapters.
+The public demo uses deterministic, sanitized mock radio-demand and traffic data inspired by LDP concepts. It does not copy or publish production records, subscriber records, exact sites, or internal topology. IRIMO weather warnings are fetched and parsed separately, then associated with provinces and cities when location names are available. Live wind and condition data is corroborated through Open-Meteo, with optional OpenWeatherMap and WeatherAPI.com adapters.
 
-| Command-center domain | Design source | Public demo state |
+| Customer-facing domain | Design source | Public demo state |
 | --- | --- | --- |
-| RRC, TRP and capacity allocations | LDP PW dashboard contract | Sanitized mock |
-| Equipment and TX topology | TxTopoli inventory/topology contract | Sanitized mock |
-| Core PS, Core CS, IP and wireless resources | MonRes CTO report contract | Sanitized mock |
-| Incidents, audits, PPE and training | EHS operational contract | Sanitized mock |
+| Radio demand and typical speed | LDP RRC/TRP concepts | Sanitized mock |
+| Customer experience and availability | Derived presentation model | Sanitized mock |
 | Weather conditions and wind | Open-Meteo + configured weather providers | Provider-backed snapshot |
 | Official warnings | IRIMO | Official parsed snapshot |
 
@@ -84,19 +79,15 @@ Copy `.env.example` into the server environment and add the optional provider ke
 
 No production NMS/OSS connector, real subscriber record, private topology record or production site coordinate is included in the public repository.
 
-## Map layers
+## Map views
 
 | Layer | What it answers |
 | --- | --- |
-| Conditions | What does the network “weather” look like? |
+| Live weather | What are provider-backed weather and observed wind doing now? |
+| Customer experience | Where should service feel great, good, busy, or limited? |
+| Demand | Where is LDP-inspired RRC pressure rising? |
+| Speed | What typical LDP-inspired TRP throughput may customers experience? |
 | IRIMO warnings | Which provinces have official weather warnings? |
-| Coverage | Where is population coverage weaker? |
-| Traffic | Where are the busiest network corridors? |
-| Congestion | Which provinces are approaching capacity? |
-| Latency | Where is response time deteriorating? |
-| Incidents | Where are active operational problems concentrated? |
-| Maintenance | What planned work is active or approaching? |
-| Technology | Where are 4G, 5G, and 5G+ represented? |
 
 ## Verification
 

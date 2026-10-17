@@ -4,18 +4,18 @@ const urlFrame = Number(new URLSearchParams(window.location.search).get('frame')
 const state = { frame: Number.isInteger(urlFrame) && urlFrame >= 0 && urlFrame < 13 ? urlFrame : 6, playing: false, speed: 1, layer: 'condition', audience: 'executive', reducedMotion: false, story: 0, mapZoom: 1, mapX: 0, mapY: 0, acknowledgedAlerts: new Set(), irimoWarnings: [], irimoStatus: 'loading', weatherConditions: null, weatherStatus: 'loading', selectedProvince: null };
 try { state.acknowledgedAlerts = new Set(JSON.parse(localStorage.getItem('network-weather-acknowledged') || '[]')); } catch { state.acknowledgedAlerts = new Set(); }
 const conditions = {
-  clear: { label:'CLEAR', weather:'sunny', title:'National network conditions stable', detail:'Radio, transport, core and subscriber impact remain controlled with isolated pressure building toward the evening peak.', className:'clear' },
-  cloud: { label:'PARTLY CLOUDY', weather:'partly', title:'Cross-domain pressure is building', detail:'RRC demand and transport utilization are rising across key corridors while core capacity remains available.', className:'cloud' },
-  rain: { label:'CONGESTION RAIN', weather:'rainy', title:'Service pressure is spreading east', detail:'Traffic, RRC occupancy and subscriber exposure are increasing. Prepare transport and core capacity actions.', className:'rain' },
-  storm: { label:'SEVERE STORM', weather:'stormy', title:'National command escalation', detail:'Correlated radio, transport, core, subscriber and safety signals require immediate management attention.', className:'storm' },
+  clear: { label:'LOOKING GOOD', weather:'sunny', title:'A good day to stay connected', detail:'Most customers should see normal voice and data service, with only a few busy areas toward the evening peak.', className:'clear' },
+  cloud: { label:'GETTING BUSY', weather:'partly', title:'A few busy patches are forming', detail:'Demand is rising in several cities. Most customers stay connected, but speeds may soften for short periods.', className:'cloud' },
+  rain: { label:'SLOWER PATCHES', weather:'rainy', title:'Slower service may spread east', detail:'Busy radio demand and local weather may make mobile data feel slower in the highlighted areas.', className:'rain' },
+  storm: { label:'SERVICE WARNING', weather:'stormy', title:'Some customers may feel disruption', detail:'Heavy demand and weather exposure overlap in a few areas. Voice remains the priority while data speeds recover.', className:'storm' },
 };
 const stories = [
   ['Today','What is happening now?','Explain the overall condition and the top KPI drivers.'],
   ['Regional forecast','Where is pressure moving?','Follow the congestion front as it moves through the eastern corridor.'],
   ['Traffic climate','How is demand changing?','Compare utilization, latency, and throughput as the peak builds.'],
   ['Severe conditions','What needs attention?','Open warnings and connect each one to an affected area and time.'],
-  ['Engineer radar','What is the technical cause?','Switch to engineering view for radio quality, handovers, and backhaul context.'],
-  ['Maintenance forecast','What is planned?','Show the airport maintenance window and its expected redundancy impact.'],
+  ['Why it feels slower','What is behind the forecast?','Open network details to compare radio demand and traffic without exposing internal site data.'],
+  ['Tomorrow','What happens next?','Move the time slider forward to show when the customer experience should recover.'],
 ];
 let mapProjection = null;
 const cityLabels = [];
@@ -102,10 +102,11 @@ function render() {
   $('#condition-badge').className = `condition-badge ${condition.className}`;
   $('#narrative').textContent = narrative(frame);
   const tickerAlerts = [...api.alerts, ...ruleAlerts(frame)].filter((alert) => alert.state !== 'Forecast' || state.frame >= 7);
-  $('#ticker-text').textContent = tickerAlerts.map((alert) => `[${alert.severity}] ${alert.region} · ${alert.title} · ${alert.state} ${alert.time} · ${alert.impact || alert.detail} · ${alert.confidence || frame.confidence}% confidence`).join('   ✦   ') || 'No actionable telecom alerts in this frame';
+  const customerNotice = frame.state === 'storm' ? 'Some areas may have slower or interrupted data' : frame.state === 'rain' ? 'Slower data is possible in busy eastern areas' : frame.state === 'cloud' ? 'Short busy periods are possible this evening' : 'Most customers should see normal service';
+  $('#ticker-text').textContent = `${customerNotice}   ✦   ${state.irimoWarnings.length ? `${state.irimoWarnings.length} official weather warnings mapped` : 'Weather warnings are updating'}   ✦   ${tickerAlerts.length ? `${tickerAlerts.length} service notices in the demonstration forecast` : 'No service notices right now'}`;
   $('#broadcast-now').textContent = `${frame.observed ? 'Observed' : 'Forecast'} · ${frame.time} IRST · ${frame.state.toUpperCase()}`;
   $('#broadcast-next').textContent = `${frame.utilization > 78 ? 'Peak pressure' : 'Demand building'} · ${api.frames[Math.min(state.frame + 1, api.frames.length - 1)].time} IRST`;
-  $('#broadcast-risk').textContent = frame.state === 'storm' ? 'East outage risk · Airport maintenance' : 'East interference · North congestion watch';
+  $('#broadcast-risk').textContent = frame.state === 'storm' ? 'Slower data · weather-exposed areas' : 'Busy areas · local weather changes';
   $('#confidence').textContent = `Confidence ${frame.confidence}%`; $('#source-state').textContent = `Demo telemetry · ${frame.observed ? 'Observed scenario' : 'Forecast scenario'}`;
   const weatherSource = state.weatherConditions?.source?.provider || 'Open-Meteo';
   const weatherLabel = state.weatherStatus === 'live' ? `${weatherSource} live wind` : `${weatherSource} ${state.weatherStatus}`;
@@ -114,7 +115,7 @@ function render() {
   const mapKicker = document.querySelector('.map-hud-kicker'); if (mapKicker) mapKicker.innerHTML = `<i></i> ${state.weatherStatus === 'live' || state.weatherStatus === 'snapshot' ? 'Live provider conditions' : 'Demo operations scenario'}`;
   $('#timeline').value = state.frame; renderSites(frame); renderWeatherCards(frame); renderLiveStations(); renderKpis(frame); renderOperations(frame); renderAlerts(frame); renderDetails(frame); renderStories();
   $('#map-hud-time').textContent = `${frame.time} IRST · ${frame.observed ? 'Observed' : 'Forecast'}`;
-  $('#map-hud-layer').textContent = `${state.layer[0].toUpperCase()}${state.layer.slice(1)}`;
+  $('#map-hud-layer').textContent = state.layer === 'condition' ? 'Live weather' : 'IRIMO warnings';
   $('#map-hud-warnings').textContent = state.irimoWarnings.length ? `${state.irimoWarnings.length} IRIMO warnings` : 'IRIMO feed loading';
   const windStations = (state.weatherConditions?.stations || []).filter((station) => station.windKmh != null && station.windDirection && station.lat != null && station.lon != null);
   ensureBroadcastWeather(); updateWeatherMotion(windStations, frame.state); $('#map-hud-wind').textContent = windStations.length ? `Wind observations · ${windStations.length} stations` : 'Wind observations unavailable';
@@ -150,10 +151,10 @@ function renderOperations(frame) {
   $('#ops-sources-list').innerHTML = sources.join('');
 }
 function narrative(frame) {
-  if (frame.state === 'storm') return `Severe network weather is expected across the metro by ${frame.time}. Utilization reaches ${frame.utilization}%, latency rises to ${frame.latency} milliseconds, and ${frame.incidents} active incidents need attention. Confidence is ${frame.confidence}%.`;
-  if (frame.state === 'rain') return `Network weather is turning rainy in the eastern corridor. Utilization is ${frame.utilization}% and latency is ${frame.latency} milliseconds. The next severe window is expected at 21:00.`;
-  if (frame.state === 'cloud') return `Partly cloudy conditions are developing. Utilization is ${frame.utilization}% with ${frame.incidents} active alerts. Watch the north and east as the evening peak approaches.`;
-  return `Good afternoon. Network conditions across Tehran are mostly clear. Availability is ${frame.availability}%, while demand is at ${frame.utilization}% and beginning to rise toward the evening peak.`;
+  if (frame.state === 'storm') return `Some customers may notice disruption by ${frame.time}. Demand reaches ${frame.utilization}% and response time rises to ${frame.latency} milliseconds. Voice service remains the priority while data recovers.`;
+  if (frame.state === 'rain') return `Slower mobile data may spread through the eastern corridor. Demand is ${frame.utilization}% and the next difficult period is expected around 21:00.`;
+  if (frame.state === 'cloud') return `A few busy patches are developing. Most customers remain connected, with shorter periods of slower data in the north and east.`;
+  return `Good afternoon. Most customers should see normal service. Availability is ${frame.availability}% and demand is ${frame.utilization}%, with a busier period expected this evening.`;
 }
 function renderSites(frame) {
   $('#zoom-reset').textContent = `${Math.round(state.mapZoom * 100)}%`;
@@ -175,7 +176,7 @@ function renderSites(frame) {
 }
 function applyMapTransform() {
   const transform = `translate(${state.mapX}px, ${state.mapY}px) scale(${state.mapZoom})`;
-  ['#site-layer', '#weather-layer', '#live-station-layer', '#fusion-site-layer', '#fusion-link-layer', '.iran-map', '#broadcast-weather-layer'].forEach((selector) => {
+  ['#site-layer', '#weather-layer', '#live-station-layer', '#customer-experience-layer', '.iran-map', '#broadcast-weather-layer'].forEach((selector) => {
     const node = $(selector); if (!node) return; node.style.transform = transform; node.style.transformOrigin = '50% 50%';
   });
 }
@@ -267,7 +268,7 @@ function renderWeatherCards(frame) {
   document.querySelectorAll('.province-shape').forEach((path) => path.classList.remove('wx-sunny','wx-partly','wx-rainy','wx-stormy','warning-yellow','warning-orange','warning-red'));
   $('#map-canvas').dataset.layer = state.layer; renderMapLegend();
   const totalTraffic = nodes.reduce((sum, province) => sum + province.metrics.trafficGbps, 0); const averageCoverage = nodes.reduce((sum, province) => sum + province.metrics.coverage, 0) / nodes.length; const congested = nodes.filter((province) => province.metrics.congestion >= 80).length; const incidents = nodes.reduce((sum, province) => sum + province.metrics.incidents, 0);
-  $('#map-data-strip').innerHTML = `<span><small>National traffic</small><strong>${(totalTraffic / 1000).toFixed(2)} Tbps</strong></span><span><small>Population coverage</small><strong>${averageCoverage.toFixed(1)}%</strong></span><span><small>Congested provinces</small><strong>${congested}</strong></span><span><small>Active incidents</small><strong>${incidents}</strong></span>`;
+  $('#map-data-strip').innerHTML = `<span><small>People in coverage</small><strong>${averageCoverage.toFixed(1)}%</strong></span><span><small>Typical demo speed</small><strong>${Math.round(frame.throughput)} Mbps</strong></span><span><small>Busy provinces</small><strong>${congested}</strong></span><span><small>Service notices</small><strong>${incidents}</strong></span>`;
   nodes.forEach((province, index) => {
     const metrics = province.metrics; const display = provinceLayerDisplay(metrics, province.warning); const weatherState = display.state;
     const warningLevel = province.warning?.level;
@@ -322,7 +323,7 @@ function renderKpisLegacy(frame) {
   document.querySelectorAll('[data-kpi]').forEach((card) => card.addEventListener('click', () => { state.layer = card.dataset.kpi === 'latency' ? 'latency' : card.dataset.kpi === 'utilization' ? 'traffic' : card.dataset.kpi === 'incidents' ? 'incidents' : 'condition'; document.querySelectorAll('[data-layer]').forEach((item) => item.classList.toggle('active', item.dataset.layer === state.layer)); renderSites(frame); }));
 }
 function renderAlertsLegacy(frame) { const active = api.alerts.filter((alert) => alert.state !== 'Forecast' || state.frame >= 7); $('#alert-count').textContent = `${Math.min(active.length, frame.incidents + 1)} active`; $('#alert-list').innerHTML = active.map((alert) => `<button class="alert-row ${alert.severity}" data-region="${alert.region}" data-time="${alert.time}"><span class="alert-icon">${alert.icon}</span><span><strong>${alert.title}</strong><small>${alert.detail} · ${alert.impact || 'Operational impact'} · ${alert.confidence || frame.confidence}% confidence</small></span><em>${alert.time}<br>${alert.state}</em></button>`).join(''); document.querySelectorAll('.alert-row').forEach((row) => row.addEventListener('click', () => { const region = api.regions.find((item) => item.id === row.dataset.region); const target = api.frames.findIndex((item) => item.time === row.dataset.time); if (target >= 0) state.frame = target; if (region) selectRegion(region); render(); })); }
-function renderDetails(frame) { const region = state.selectedRegion || { name:'Metro overview', sites:12 }; const audience = state.audience; const clusters = region.id ? Array.from({ length: region.sites }, (_, index) => `${region.id.toUpperCase()}-${String(index + 1).padStart(2, '0')}`) : []; let body = audience === 'engineering' ? `<div class="detail-stat"><span>Radio quality</span><strong>${frame.signal}/100 SINR proxy</strong></div><div class="detail-stat"><span>RSRP / RSRQ</span><strong>-92 dBm / -11 dB proxy</strong></div><div class="detail-stat"><span>Interference</span><strong>${frame.state === 'storm' ? 'Severe · E-04/E-05' : 'Nominal'}</strong></div><div class="detail-stat"><span>Handovers</span><strong>${frame.utilization > 78 ? 'Watch north-east edge' : 'Stable across metro'}</strong></div><div class="detail-stat"><span>Backhaul</span><strong>${frame.latency > 50 ? 'Capacity pressure' : 'Nominal · 99.97%'}</strong></div><div class="detail-stat"><span>Latency</span><strong>${frame.latency} ms · ${frame.observed ? 'observed' : 'forecast'}</strong></div>` : audience === 'noc' ? `<div class="detail-stat"><span>Operational status</span><strong>${frame.incidents ? `${frame.incidents} incidents in scope` : 'All systems nominal'}</strong></div><div class="detail-stat"><span>Freshness</span><strong>${frame.observed ? '42 seconds ago' : 'Forecast frame'}</strong></div><div class="detail-stat"><span>Top action</span><strong>${frame.state === 'storm' ? 'Escalate severe conditions' : 'Monitor forecast edge'}</strong></div>` : `<div class="detail-stat"><span>Customer impact</span><strong>${frame.state === 'storm' ? 'High in east and north' : frame.state === 'rain' ? 'Moderate in east' : 'Low / contained'}</strong></div><div class="detail-stat"><span>Network outlook</span><strong>${frame.state === 'clear' ? 'Healthy through midday' : 'Pressure rising into peak'}</strong></div><div class="detail-stat"><span>Coverage</span><strong>${region.sites || 12} site clusters reporting</strong></div>`; $('#detail-title').textContent = region.name; $('#detail-content').innerHTML = `${body}${clusters.length ? `<div class="detail-stat cluster-stat"><span>Site / cluster detail</span><div class="cluster-list">${clusters.map((cluster) => `<button class="cluster-chip ${state.selectedSite === cluster ? 'active' : ''}" data-site="${cluster}">${cluster}</button>`).join('')}</div></div>` : ''}`; document.querySelectorAll('[data-site]').forEach((button) => button.addEventListener('click', () => { state.selectedSite = button.dataset.site; renderDetails(frame); })); }
+function renderDetailsLegacy(frame) { const region = state.selectedRegion || { name:'Metro overview', sites:12 }; const audience = state.audience; const clusters = region.id ? Array.from({ length: region.sites }, (_, index) => `${region.id.toUpperCase()}-${String(index + 1).padStart(2, '0')}`) : []; let body = audience === 'engineering' ? `<div class="detail-stat"><span>Radio quality</span><strong>${frame.signal}/100 SINR proxy</strong></div><div class="detail-stat"><span>RSRP / RSRQ</span><strong>-92 dBm / -11 dB proxy</strong></div><div class="detail-stat"><span>Interference</span><strong>${frame.state === 'storm' ? 'Severe · E-04/E-05' : 'Nominal'}</strong></div><div class="detail-stat"><span>Handovers</span><strong>${frame.utilization > 78 ? 'Watch north-east edge' : 'Stable across metro'}</strong></div><div class="detail-stat"><span>Backhaul</span><strong>${frame.latency > 50 ? 'Capacity pressure' : 'Nominal · 99.97%'}</strong></div><div class="detail-stat"><span>Latency</span><strong>${frame.latency} ms · ${frame.observed ? 'observed' : 'forecast'}</strong></div>` : audience === 'noc' ? `<div class="detail-stat"><span>Operational status</span><strong>${frame.incidents ? `${frame.incidents} incidents in scope` : 'All systems nominal'}</strong></div><div class="detail-stat"><span>Freshness</span><strong>${frame.observed ? '42 seconds ago' : 'Forecast frame'}</strong></div><div class="detail-stat"><span>Top action</span><strong>${frame.state === 'storm' ? 'Escalate severe conditions' : 'Monitor forecast edge'}</strong></div>` : `<div class="detail-stat"><span>Customer impact</span><strong>${frame.state === 'storm' ? 'High in east and north' : frame.state === 'rain' ? 'Moderate in east' : 'Low / contained'}</strong></div><div class="detail-stat"><span>Network outlook</span><strong>${frame.state === 'clear' ? 'Healthy through midday' : 'Pressure rising into peak'}</strong></div><div class="detail-stat"><span>Coverage</span><strong>${region.sites || 12} site clusters reporting</strong></div>`; $('#detail-title').textContent = region.name; $('#detail-content').innerHTML = `${body}${clusters.length ? `<div class="detail-stat cluster-stat"><span>Site / cluster detail</span><div class="cluster-list">${clusters.map((cluster) => `<button class="cluster-chip ${state.selectedSite === cluster ? 'active' : ''}" data-site="${cluster}">${cluster}</button>`).join('')}</div></div>` : ''}`; document.querySelectorAll('[data-site]').forEach((button) => button.addEventListener('click', () => { state.selectedSite = button.dataset.site; renderDetailsLegacy(frame); })); }
 function renderStories() { $('#story-index').textContent = `${state.story + 1} / ${stories.length}`; $('#story-list').innerHTML = stories.map((story, index) => `<button class="story-row ${index === state.story ? 'active' : ''}" data-story="${index}"><span>0${index + 1}</span><b>${story[0]}</b><small>${story[1]}</small></button>`).join(''); document.querySelectorAll('.story-row').forEach((row) => row.addEventListener('click', () => { state.story = Number(row.dataset.story); render(); })); }
 function selectRegion(region) { state.selectedRegion = region; renderDetails(api.getFrame(state.frame)); document.querySelectorAll('.site-dot').forEach((dot) => dot.classList.remove('selected')); const dots = [...document.querySelectorAll('.site-dot')]; const index = api.regions.findIndex((item) => item.id === region.id); if (dots[index]) dots[index].classList.add('selected'); }
 $('#timeline').addEventListener('input', (event) => { state.frame = Number(event.target.value); render(); });
@@ -339,7 +340,7 @@ $('#audience-select').addEventListener('change', (event) => { state.audience = e
 render();
 
 // Keep demo provenance visible in the KPI and province drill-down surfaces.
-function renderKpis(frame) {
+function renderKpisLegacyTwo(frame) {
   const items = [['availability','Availability',`${frame.availability}%`,'+0.4%','good'],['utilization','Utilization',`${frame.utilization}%`,frame.utilization > 78 ? 'Peak pressure' : 'Within plan',frame.utilization > 78 ? 'warn' : 'good'],['latency','Latency',`${frame.latency} ms`,frame.latency > 45 ? 'Rising' : 'Stable',frame.latency > 45 ? 'warn' : 'good'],['throughput','Throughput',`${frame.throughput} Mbps`,'Across metro','good'],['loss','Packet loss',`${frame.loss}%`,frame.loss > 1.5 ? 'Degraded' : 'Nominal',frame.loss > 1.5 ? 'bad' : 'good'],['signal','Signal quality',`${frame.signal}/100`,frame.signal < 75 ? 'Watch edge' : 'Healthy',frame.signal < 75 ? 'warn' : 'good'],['incidents','Active incidents',String(frame.incidents),frame.incidents ? 'Needs review' : 'All clear',frame.incidents ? 'warn' : 'good']];
   $('#kpi-grid').innerHTML = items.map(([key,label,value,trend,kind]) => `<button class="kpi-card" data-kpi="${key}" aria-label="Focus ${label}; demo scenario ${frame.observed ? 'observed' : 'forecast'}"><span>${label}</span><strong>${value}</strong><small class="${kind}">${trend}</small><em>Demo scenario · ${frame.observed ? 'observed' : 'forecast'} frame</em><div class="spark ${kind}"><i></i><i></i><i></i><i></i><i></i><i></i></div></button>`).join('');
   document.querySelectorAll('[data-kpi]').forEach((card) => card.addEventListener('click', () => { state.layer = card.dataset.kpi === 'latency' ? 'latency' : card.dataset.kpi === 'utilization' ? 'traffic' : card.dataset.kpi === 'incidents' ? 'incidents' : 'condition'; document.querySelectorAll('[data-layer]').forEach((item) => item.classList.toggle('active', item.dataset.layer === state.layer)); renderSites(frame); renderWeatherCards(frame); }));
@@ -431,7 +432,7 @@ async function loadIrimoWarnings() {
       return;
     } catch (snapshotError) {
       state.irimoStatus = 'unavailable';
-      $('#map-scope').textContent = 'Iran · 31 provinces · demo telemetry · IRIMO unavailable · 12 site clusters';
+      $('#map-scope').textContent = 'Iran · 31 provinces · live weather · IRIMO unavailable · customer experience demo';
       $('#broadcast-source').textContent = 'Demo telemetry · IRIMO unavailable';
       status.textContent = 'ERROR · source unavailable';
       list.innerHTML = '<div class="irimo-empty">IRIMO feed unavailable. Telecom impact cards remain visible as illustrative platform data.</div>';
@@ -445,7 +446,7 @@ function renderIrimoPayload(payload) {
     state.irimoStatus = payload.status || 'fallback';
     renderWeatherConsensus();
     $('#map-hud-warnings').textContent = `${state.irimoWarnings.length} IRIMO warnings`;
-    $('#map-scope').textContent = `Iran · 31 provinces · demo telemetry · IRIMO ${state.irimoStatus} · 12 site clusters`;
+    $('#map-scope').textContent = `Iran · 31 provinces · live weather · IRIMO ${state.irimoStatus} · customer experience demo`;
     const mode = payload.status === 'live' ? 'LIVE' : payload.status === 'snapshot' ? 'SNAPSHOT' : payload.status === 'stale' ? 'STALE' : 'FALLBACK';
     const fetched = payload.fetchedAt ? new Date(payload.fetchedAt).toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }) : 'time unavailable';
     status.textContent = `${mode} · ${payload.warnings.length} bulletins · fetched ${fetched}`;
@@ -467,13 +468,13 @@ function ruleAlerts(frame) {
   if (frame.incidents >= 7) generated.push({ id:'rule-incident-' + frame.time, groupId:'rule-incident', severity:'critical', icon:'✖', title:'Incident threshold crossed', detail:'Rule: seven or more active incidents', region:'east', time:frame.time, state:frame.observed ? 'Observed' : 'Forecast', confidence:frame.confidence, impact:'High customer impact' });
   return generated;
 }
-function renderKpis(frame) {
+function renderKpisLegacyThree(frame) {
   const quality = (key) => key === 'throughput' && frame.time === '11:00' ? { state:'stale', label:'Stale · last known' } : key === 'signal' && frame.time === '21:00' ? { state:'stale', label:'Stale · degraded feed' } : key === 'incidents' && frame.time === '00:00' ? { state:'na', label:'Not applicable' } : { state:'healthy', label:frame.observed ? 'Demo scenario · observed' : 'Demo scenario · forecast' };
   const items = [['availability','Availability',frame.availability + '%','+0.4%','good'],['utilization','Utilization',frame.utilization + '%',frame.utilization > 78 ? 'Peak pressure' : 'Within plan',frame.utilization > 78 ? 'warn' : 'good'],['latency','Latency',frame.latency + ' ms',frame.latency > 45 ? 'Rising' : 'Stable',frame.latency > 45 ? 'warn' : 'good'],['throughput','Throughput',frame.throughput + ' Mbps','Across metro','good'],['loss','Packet loss',frame.loss + '%',frame.loss > 1.5 ? 'Degraded' : 'Nominal',frame.loss > 1.5 ? 'bad' : 'good'],['signal','Signal quality',frame.signal + '/100',frame.signal < 75 ? 'Watch edge' : 'Healthy',frame.signal < 75 ? 'warn' : 'good'],['incidents','Active incidents',String(frame.incidents),frame.incidents ? 'Needs review' : 'All clear',frame.incidents ? 'warn' : 'good']];
   $('#kpi-grid').innerHTML = items.map(([key,label,value,trend,kind]) => { const meta = quality(key); const displayValue = meta.state === 'na' ? '—' : value; const statusClass = meta.state === 'healthy' ? kind : 'data-quality-' + meta.state; return '<button class="kpi-card data-' + meta.state + '" data-kpi="' + key + '" aria-label="Focus ' + label + '; ' + meta.label + '"><span>' + label + '</span><strong>' + displayValue + '</strong><small class="' + statusClass + '">' + (meta.state === 'healthy' ? trend : meta.label) + '</small><em>' + (meta.state === 'healthy' ? `Demo scenario · ${frame.observed ? 'observed' : 'forecast'} frame` : 'Data quality flag') + '</em><div class="spark ' + kind + '"><i></i><i></i><i></i><i></i><i></i><i></i></div></button>'; }).join('');
   document.querySelectorAll('[data-kpi]').forEach((card) => card.addEventListener('click', () => { state.layer = card.dataset.kpi === 'latency' ? 'latency' : card.dataset.kpi === 'utilization' ? 'traffic' : card.dataset.kpi === 'incidents' ? 'incidents' : 'condition'; document.querySelectorAll('[data-layer]').forEach((item) => item.classList.toggle('active', item.dataset.layer === state.layer)); renderSites(frame); }));
 }
-function renderAlerts(frame) {
+function renderAlertsLegacyTwo(frame) {
   const active = [...api.alerts, ...ruleAlerts(frame)].filter((alert) => alert.state !== 'Forecast' || state.frame >= 7);
   const groups = [...active.reduce((map, alert) => { const key = alert.groupId || alert.id; const group = map.get(key) || []; group.push(alert); map.set(key, group); return map; }, new Map()).values()];
   $('#alert-count').textContent = Math.min(active.length, frame.incidents + 1) + ' active · ' + groups.length + ' groups';

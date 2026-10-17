@@ -4,97 +4,93 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#090b0a" />
-  <title>Network Weather · National Telecom Command Center</title>
+  <title>Network Weather · Customer Experience Forecast</title>
   <link rel="stylesheet" href="./styles.css?v=20261017-6" />
   <link rel="stylesheet" href="./ticker.css?v=20261016-1" />
   <link rel="stylesheet" href="./carrier-theme.css?v=20261016-5" />
   <link rel="stylesheet" href="./viewport-fix.css?v=20261017-6" />
-  <link rel="stylesheet" href="./command-center.css?v=20261017-4" />
+  <link rel="stylesheet" href="./customer-experience.css?v=20261017-1" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <div class="brand"><span class="brand-mark">NW</span><div><strong>NETWORK WEATHER</strong><small>National telecom command center</small></div></div>
-      <div class="topbar-actions"><span class="live-dot"><i></i> DEMO SCENARIO</span><button class="ghost-btn" id="presenter-btn" aria-pressed="false">Presenter mode</button><button class="ghost-btn" id="fullscreen-btn">Fullscreen</button><button class="ghost-btn" id="motion-btn" aria-pressed="false">Reduce motion</button></div>
+      <div class="brand"><span class="brand-mark">NW</span><div><strong>NETWORK WEATHER</strong><small>Customer experience forecast</small></div></div>
+      <div class="topbar-actions"><span class="live-dot"><i></i> WEATHER LIVE · NETWORK DEMO</span><button class="ghost-btn" id="presenter-btn" aria-pressed="false">TV mode</button><button class="ghost-btn" id="fullscreen-btn">Fullscreen</button><button class="ghost-btn" id="motion-btn" aria-pressed="false">Reduce motion</button></div>
     </header>
 
     <main>
       <section class="forecast-header">
-        <div><p class="eyebrow">Iran digital twin · Cross-domain command · <span id="scenario-date">Demo scenario</span></p><h1 id="headline">National network intelligence</h1><p class="subhead" id="headline-detail">One operational picture connecting radio capacity, subscribers, transmission, core resources, EHS risk and provider-backed weather.</p></div>
+        <div><p class="eyebrow">Weather + customer experience · <span id="scenario-date">Demo scenario</span></p><h1 id="headline">Your network forecast</h1><p class="subhead" id="headline-detail">See where weather and demand may change mobile service across Iran—now and throughout the day.</p></div>
         <div class="condition-badge" id="condition-badge"><span id="condition-icon">☀</span><div><strong id="condition-label">CLEAR</strong><small id="condition-meta">Observed · 14:00 IRST</small></div></div>
       </section>
-      <div class="ticker-bar" role="status" aria-live="polite"><strong>SEVERE NETWORK WEATHER BULLETIN</strong><span id="ticker-text">Eastern corridor interference observed · North ridge congestion watch at 18:00 · Airport maintenance planned at 21:00</span></div>
-      <div class="broadcast-crawl" aria-label="Broadcast summary"><span><b>NOW</b><strong id="broadcast-now">Observed · 14:00 IRST</strong></span><span><b>NEXT</b><strong id="broadcast-next">Peak pressure · 18:00 IRST</strong></span><span><b>WATCH</b><strong id="broadcast-risk">East interference · Airport maintenance</strong></span><span><b>SOURCES</b><strong id="broadcast-source">Demo telemetry · IRIMO warnings separate</strong></span></div>
+      <div class="ticker-bar" role="status" aria-live="polite"><strong>CUSTOMER EXPERIENCE BULLETIN</strong><span id="ticker-text">Most customers should see normal service · Demand rises toward the evening peak · Weather warnings are shown on the map</span></div>
+      <div class="broadcast-crawl" aria-label="Broadcast summary"><span><b>NOW</b><strong id="broadcast-now">Observed · 14:00 IRST</strong></span><span><b>NEXT</b><strong id="broadcast-next">Demand rises · 18:00 IRST</strong></span><span><b>WATCH</b><strong id="broadcast-risk">Weather and busy areas</strong></span><span><b>SOURCES</b><strong id="broadcast-source">Live weather · Demonstration network data</strong></span></div>
 
-      <section class="source-ribbon" id="source-ribbon" aria-label="Command center data sources"></section>
-      <section class="executive-pulse" id="executive-pulse" aria-label="National executive pulse"></section>
+      <section class="customer-pulse" id="customer-pulse" aria-label="Customer experience snapshot"></section>
 
-      <section class="command-deck" aria-label="Cross-domain decision deck">
-        <article class="panel command-panel"><div class="panel-heading"><div><span class="section-kicker">PRIORITY FUSION QUEUE</span><h2>Where management attention goes next</h2></div><span class="mock-badge">SANITIZED MOCK</span></div><div class="hotspot-list" id="hotspot-list"></div></article>
-        <article class="panel command-panel"><div class="panel-heading"><div><span class="section-kicker">CORE DEPENDENCY GRAPH</span><h2>National service backbone</h2></div><span class="mock-badge">MONRES MODEL</span></div><div class="topology-mini" id="topology-mini"></div></article>
+      <section class="customer-intro panel" aria-label="Customer experience outlook">
+        <div><span class="section-kicker">TODAY'S SERVICE OUTLOOK</span><h2>Mobile service, explained like weather</h2><p>Live weather sits beside an LDP-inspired model of radio demand and traffic. The result is a simple forecast of what customers may feel—not a wall of network alarms.</p></div>
+        <div class="experience-scale"><span class="excellent"><i></i> Great</span><span class="good"><i></i> Good</span><span class="busy"><i></i> Busy</span><span class="limited"><i></i> Limited</span></div>
       </section>
 
       <section class="broadcast-grid">
         <article class="map-panel panel">
-          <div class="panel-heading"><div><span class="section-kicker">LIVE IRAN NETWORK MAP</span><h2>Iran network weather map</h2></div><div class="map-tools"><button class="chip active" data-layer="condition">Conditions</button><button class="chip" data-layer="warnings">IRIMO warnings</button><button class="chip" data-layer="coverage">Coverage</button><button class="chip" data-layer="traffic">Traffic</button><button class="chip" data-layer="congestion">Congestion</button><button class="chip" data-layer="latency">Latency</button><button class="chip" data-layer="incidents">Incidents</button><button class="chip" data-layer="maintenance">Maintenance</button><button class="chip" data-layer="technology">Technology</button></div></div>
-          <div class="fusion-map-toolbar"><span>Digital-twin overlay</span><button class="fusion-toggle active" data-site-layer="weather">Weather live</button><button class="fusion-toggle" data-site-layer="health">Health</button><button class="fusion-toggle" data-site-layer="rrc">RRC</button><button class="fusion-toggle" data-site-layer="subscribers">Subscribers</button><button class="fusion-toggle" data-site-layer="tx">TX load</button><button class="fusion-toggle" data-site-layer="ehs">EHS</button></div>
-          <div class="map-canvas" id="map-canvas" aria-label="Interactive Iran telecom weather map with province-aligned forecasts, IRIMO warning severity, regional hubs, and sample site clusters"><div class="map-grid"></div><div class="weather-radar-field"></div><div class="country-glow"></div><div class="map-hud"><div><span class="map-hud-kicker"><i></i> Demo operations scenario</span><strong id="map-hud-layer">Conditions</strong></div><div class="map-hud-stats"><span id="map-hud-time">14:00 IRST</span><span id="map-hud-warnings">IRIMO feed loading</span></div></div><svg class="iran-map" viewBox="0 0 760 500" aria-hidden="true"><path class="iran-outline" d="M106 148 146 126 181 132 209 112 255 119 281 100 325 112 358 96 402 111 436 105 472 127 505 132 534 157 572 175 594 207 581 233 603 261 592 292 614 317 596 349 561 354 541 384 503 391 477 421 438 411 405 435 370 423 343 403 309 414 280 392 244 397 220 369 184 356 168 322 141 301 151 270 128 237 145 208 123 181Z"/><path class="iran-ridge" d="M145 178 210 155 277 162 340 140 410 151 476 155 540 194 563 238 548 280 575 316 535 335 495 365 433 375 381 397 329 380 278 371 222 350 190 316 164 274 178 231Z"/></svg><div id="weather-layer" aria-label="Province weather and warning markers"></div><div id="live-station-layer" aria-label="Live weather provider station cards"></div><div id="warning-layer" aria-label="IRIMO warning markers"></div><div id="site-layer"></div><div class="map-overlay"><span><i class="legend-swatch clear"></i> Sunny</span><span><i class="legend-swatch cloud"></i> Cloud</span><span><i class="legend-swatch rain"></i> Rain</span><span><i class="legend-swatch storm"></i> Storm</span><span><i class="legend-swatch warning"></i> IRIMO alert outline</span><span><i class="legend-swatch site"></i> Demo site cluster</span></div></div>
-          <div class="map-foot"><span id="map-scope">Iran · 31 provinces · province forecasts · live IRIMO overlay · 12 site clusters</span><span id="map-layer-label">Condition layer</span><a id="map-source" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">Boundary: OSM-derived GeoJSON · © OSM</a><button class="text-btn" id="pan-left" aria-label="Pan map left">←</button><button class="text-btn" id="pan-up" aria-label="Pan map up">↑</button><button class="text-btn" id="pan-down" aria-label="Pan map down">↓</button><button class="text-btn" id="pan-right" aria-label="Pan map right">→</button><button class="text-btn" id="zoom-out" aria-label="Zoom out">−</button><button class="text-btn" id="zoom-reset" aria-label="Reset map zoom">100%</button><button class="text-btn" id="zoom-in" aria-label="Zoom in">+</button><button class="text-btn" id="reset-map">Reset view ↺</button></div>
+          <div class="panel-heading"><div><span class="section-kicker">LIVE IRAN FORECAST</span><h2>Weather &amp; mobile experience</h2></div><div class="map-tools"><button class="chip active" data-layer="condition">Weather</button><button class="chip" data-layer="warnings">IRIMO warnings</button></div></div>
+          <div class="customer-map-toolbar" role="group" aria-label="Map view"><span>SHOW</span><button class="experience-toggle active" data-experience-layer="weather">Live weather</button><button class="experience-toggle" data-experience-layer="experience">Customer experience</button><button class="experience-toggle" data-experience-layer="demand">Demand</button><button class="experience-toggle" data-experience-layer="speed">Speed</button></div>
+          <div class="map-canvas" id="map-canvas" aria-label="Interactive Iran map with province weather, official warnings, and demonstration customer experience forecasts"><div class="map-grid"></div><div class="weather-radar-field"></div><div class="country-glow"></div><div class="map-hud"><div><span class="map-hud-kicker"><i></i> Live provider conditions</span><strong id="map-hud-layer">Weather</strong></div><div class="map-hud-stats"><span id="map-hud-time">14:00 IRST</span><span id="map-hud-warnings">IRIMO feed loading</span><span id="map-hud-wind">Wind observations loading</span></div></div><svg class="iran-map" viewBox="0 0 760 500" aria-hidden="true"><path class="iran-outline" d="M106 148 146 126 181 132 209 112 255 119 281 100 325 112 358 96 402 111 436 105 472 127 505 132 534 157 572 175 594 207 581 233 603 261 592 292 614 317 596 349 561 354 541 384 503 391 477 421 438 411 405 435 370 423 343 403 309 414 280 392 244 397 220 369 184 356 168 322 141 301 151 270 128 237 145 208 123 181Z"/><path class="iran-ridge" d="M145 178 210 155 277 162 340 140 410 151 476 155 540 194 563 238 548 280 575 316 535 335 495 365 433 375 381 397 329 380 278 371 222 350 190 316 164 274 178 231Z"/></svg><div id="weather-layer" aria-label="Province weather and warning markers"></div><div id="live-station-layer" aria-label="Live weather provider station cards"></div><div id="warning-layer" aria-label="IRIMO warning markers"></div><div id="site-layer"></div><div id="customer-experience-layer" aria-label="Demonstration customer experience by region"></div><div class="map-overlay"><span><i class="legend-swatch clear"></i> Sunny / great</span><span><i class="legend-swatch cloud"></i> Cloud / good</span><span><i class="legend-swatch rain"></i> Rain / busy</span><span><i class="legend-swatch storm"></i> Storm / limited</span><span><i class="legend-swatch warning"></i> IRIMO warning</span></div></div>
+          <div class="map-foot"><span id="map-scope">Iran · 31 provinces · live weather · customer experience demo</span><span id="map-layer-label">Weather layer</span><a id="map-source" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">Boundary: OSM-derived GeoJSON · © OSM</a><button class="text-btn" id="pan-left" aria-label="Pan map left">←</button><button class="text-btn" id="pan-up" aria-label="Pan map up">↑</button><button class="text-btn" id="pan-down" aria-label="Pan map down">↓</button><button class="text-btn" id="pan-right" aria-label="Pan map right">→</button><button class="text-btn" id="zoom-out" aria-label="Zoom out">−</button><button class="text-btn" id="zoom-reset" aria-label="Reset map zoom">100%</button><button class="text-btn" id="zoom-in" aria-label="Zoom in">+</button><button class="text-btn" id="reset-map">Reset view ↺</button></div>
           <div class="map-data-strip" id="map-data-strip" aria-label="Illustrative national telecom summary"></div>
         </article>
 
         <aside class="right-rail">
-          <article class="panel condition-panel"><div class="section-kicker">PRESENTER BRIEF</div><p class="narrative" id="narrative" aria-live="polite">Good afternoon. Network conditions across Tehran are mostly clear. Availability is strong, while demand is beginning to rise in the north ahead of the evening peak.</p><div class="narrative-meta"><span id="confidence">Confidence 96%</span><span id="source-state">Observed frame</span></div><button class="primary-btn" id="next-story">Next story beat →</button></article>
-          <article class="panel alert-panel"><div class="panel-heading compact"><div><span class="section-kicker">IRIMO WEATHER WARNINGS · TELECOM IMPACT</span><h2>Warnings</h2><a class="source-link" href="https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%AF%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html" target="_blank" rel="noreferrer">Official IRIMO warning list ↗</a></div><span class="alert-count" id="alert-count">2 active</span></div><div class="warning-scale" aria-label="IRIMO warning levels"><span class="irimo-yellow"><b>IRIMO yellow</b> Awareness / prepare</span><span class="irimo-orange"><b>IRIMO orange</b> Urgent action</span><span class="irimo-red"><b>IRIMO red</b> Immediate action</span></div><div class="irimo-live-header"><b>LIVE IRIMO FEED</b><span id="irimo-feed-status">Loading official warnings…</span></div><div class="irimo-live-list" id="irimo-live-list" aria-live="polite"><div class="irimo-empty">Loading official warnings…</div></div><div class="weather-consensus" id="weather-consensus" aria-live="polite"><b>Cross-source consensus</b><span>Waiting for provider votes…</span></div><div class="alert-list" id="alert-list"></div></article>
+          <article class="panel condition-panel"><div class="section-kicker">TODAY IN 30 SECONDS</div><p class="narrative" id="narrative" aria-live="polite">Most customers should see normal service. Demand begins to rise toward the evening peak.</p><div class="narrative-meta"><span id="confidence">Confidence 96%</span><span id="source-state">Observed frame</span></div><button class="primary-btn" id="next-story">Next forecast →</button></article>
+          <article class="panel customer-region-card"><div class="panel-heading compact"><div><span class="section-kicker">SELECTED AREA</span><h2 id="customer-region-title">Tehran</h2></div><span class="experience-badge good" id="customer-region-badge">GOOD</span></div><div id="customer-region-detail" aria-live="polite"></div></article>
+          <article class="panel alert-panel"><div class="panel-heading compact"><div><span class="section-kicker">OFFICIAL WEATHER WARNINGS</span><h2>Weather that may affect service</h2><a class="source-link" href="https://www.irimo.ir/far/wd/592-%D9%87%D8%B4%D8%A7%D8%B1%D9%87%D8%A7%DB%8C-%D9%87%D9%88%D8%A7%D8%B4%D9%86%D8%A7%D8%B3%DB%8C.html" target="_blank" rel="noreferrer">Official IRIMO warning list ↗</a></div><span class="alert-count" id="alert-count">2 active</span></div><div class="warning-scale" aria-label="IRIMO warning levels"><span class="irimo-yellow"><b>Yellow</b> Be aware</span><span class="irimo-orange"><b>Orange</b> Service risk</span><span class="irimo-red"><b>Red</b> Major risk</span></div><div class="irimo-live-header"><b>IRIMO FEED</b><span id="irimo-feed-status">Loading official warnings…</span></div><div class="irimo-live-list" id="irimo-live-list" aria-live="polite"><div class="irimo-empty">Loading official warnings…</div></div><div class="weather-consensus" id="weather-consensus" aria-live="polite"><b>Cross-source consensus</b><span>Waiting for provider votes…</span></div><div class="alert-list" id="alert-list"></div></article>
         </aside>
       </section>
 
-      <section class="panel integration-panel" aria-labelledby="integration-title">
-        <div class="panel-heading"><div><span class="section-kicker">UNIFIED OPERATIONS FABRIC</span><h2 id="integration-title">Every management domain in one decision surface</h2></div><span class="mock-badge">WEATHER LIVE · NETWORK MOCK</span></div>
-        <div class="domain-tabs" role="tablist" aria-label="Operational domains"><button class="domain-tab active" data-domain="overview">Command overview</button><button class="domain-tab" data-domain="ran">RRC &amp; TRP · LDP</button><button class="domain-tab" data-domain="subscribers">Subscribers</button><button class="domain-tab" data-domain="tx">TX topology · TxTopoli</button><button class="domain-tab" data-domain="core">Core &amp; IP · MonRes</button><button class="domain-tab" data-domain="ehs">EHS readiness</button></div>
-        <div class="domain-panel" id="domain-panel" role="tabpanel"></div>
+      <section class="panel regional-outlook" aria-labelledby="regional-outlook-title">
+        <div class="panel-heading"><div><span class="section-kicker">AROUND IRAN</span><h2 id="regional-outlook-title">Where experience may change</h2></div><span class="mock-badge">LDP-INSPIRED DEMO</span></div>
+        <div class="regional-outlook-list" id="regional-outlook-list"></div>
       </section>
 
-      <section class="panel asset-panel" aria-labelledby="asset-title">
-        <div class="asset-controls"><div><span class="section-kicker">360° ASSET INTELLIGENCE</span><h2 id="asset-title">Site digital twin</h2></div><label>Find site, city or province <input id="site-search" list="site-options" value="DEMO-THR-AZ-014" autocomplete="off" /><datalist id="site-options"><option value="DEMO-THR-AZ-014">Tehran</option><option value="DEMO-THR-MRD-022">Karaj</option><option value="DEMO-TBZ-NT-009">Tabriz</option><option value="DEMO-MHD-RZ-031">Mashhad</option><option value="DEMO-ISF-CT-018">Isfahan</option><option value="DEMO-SHZ-FR-011">Shiraz</option><option value="DEMO-BND-HR-007">Bandar Abbas</option><option value="DEMO-KRM-KR-016">Kerman</option></datalist></label></div>
-        <div id="asset-inspector" aria-live="polite"></div>
-      </section>
-
-      <section class="kpi-grid" id="kpi-grid"></section>
-
-      <section class="operations-panel panel" aria-labelledby="operations-title">
+      <details class="technical-details panel">
+        <summary><span><b>Network details</b><small>Optional LDP-inspired RRC, TRP, capacity, and forecast evidence</small></span><em>Open technical view</em></summary>
+        <section class="kpi-grid" id="kpi-grid"></section>
+        <section class="operations-panel" aria-labelledby="operations-title">
         <div class="panel-heading">
-          <div><span class="section-kicker">OPERATIONS CONTROL ROOM</span><h2 id="operations-title">Network evidence &amp; capacity watch</h2></div>
-          <span class="ops-mode" id="ops-mode">DEMO TELEMETRY</span>
+          <div><span class="section-kicker">LDP-INSPIRED NETWORK DETAIL</span><h2 id="operations-title">Radio demand &amp; traffic evidence</h2></div>
+          <span class="ops-mode" id="ops-mode">SANITIZED MOCK</span>
         </div>
         <div class="ops-summary" id="ops-summary" aria-live="polite"></div>
         <div class="ops-body">
           <div class="ops-watchlist">
-            <div class="ops-subheading"><strong>Priority review queue</strong><span>Ranked by utilization, coverage, and incidents</span></div>
+            <div class="ops-subheading"><strong>Areas under pressure</strong><span>RRC demand and TRP traffic translated into service risk</span></div>
             <div class="ops-table-wrap"><table class="ops-table"><thead><tr><th>Province</th><th>Traffic</th><th>Load</th><th>Coverage</th><th>Signal</th></tr></thead><tbody id="ops-watchlist"></tbody></table></div>
           </div>
           <div class="ops-sources">
-            <div class="ops-subheading"><strong>Evidence chain</strong><span>What the broadcast is based on</span></div>
+            <div class="ops-subheading"><strong>Forecast evidence</strong><span>Live weather and demonstration network sources</span></div>
             <div id="ops-sources-list" class="ops-source-list"></div>
           </div>
         </div>
-      </section>
+        </section>
+      </details>
 
       <section class="timeline-panel panel">
-        <div class="panel-heading"><div><span class="section-kicker">NETWORK FORECAST</span><h2>Time machine</h2></div><div class="time-mode"><button class="mini-control" id="prev-btn" aria-label="Previous forecast frame">← Previous</button><button class="mini-control" id="next-btn" aria-label="Next forecast frame">Next →</button><button class="mini-control" id="now-btn">Now</button><button class="mini-control" id="plus-hour-btn">+1 hour</button><button class="mini-control" id="tonight-btn">Tonight</button><button class="mini-control" id="tomorrow-btn">Tomorrow</button><button class="mini-control" id="play-btn">▶ Play</button><select id="speed-select" aria-label="Playback speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></div></div>
+        <div class="panel-heading"><div><span class="section-kicker">TODAY'S FORECAST</span><h2>Move through the day</h2></div><div class="time-mode"><button class="mini-control" id="prev-btn" aria-label="Previous forecast frame">← Previous</button><button class="mini-control" id="next-btn" aria-label="Next forecast frame">Next →</button><button class="mini-control" id="now-btn">Now</button><button class="mini-control" id="plus-hour-btn">+1 hour</button><button class="mini-control" id="tonight-btn">Tonight</button><button class="mini-control" id="tomorrow-btn">Tomorrow</button><button class="mini-control" id="play-btn">▶ Play</button><select id="speed-select" aria-label="Playback speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></div></div>
         <div class="timeline-wrap"><div class="timeline-axis"><span>06:00</span><span>09:00</span><span>12:00</span><span class="now-mark">NOW</span><span>18:00</span><span>21:00</span><span>00:00</span></div><input id="timeline" type="range" min="0" max="12" value="6" step="1" aria-label="Network forecast time" /><div class="timeline-segments"><span class="observed">Observed history</span><span class="future">Forecast + planned maintenance</span></div><div class="timeline-caption"><strong id="selected-time">14:00 IRST</strong><span id="selected-state">Observed condition</span><span class="forecast-confidence" id="timeline-confidence">Confidence 96%</span></div></div>
       </section>
 
       <section class="lower-grid">
-        <article class="panel detail-panel"><div class="panel-heading compact"><div><span class="section-kicker">REGIONAL DRILL-DOWN</span><h2 id="detail-title">Metro overview</h2></div><select id="audience-select" aria-label="Audience view"><option value="executive">Executive view</option><option value="noc">NOC view</option><option value="engineering">Engineering view</option></select></div><div class="detail-content" id="detail-content"></div></article>
-        <article class="panel story-panel"><div class="panel-heading compact"><div><span class="section-kicker">BROADCAST RUN OF SHOW</span><h2>Story beats</h2></div><span class="story-index" id="story-index">1 / 5</span></div><div class="story-list" id="story-list"></div></article>
+        <article class="panel detail-panel"><div class="panel-heading compact"><div><span class="section-kicker">AREA DETAILS</span><h2 id="detail-title">Metro overview</h2></div><select id="audience-select" aria-label="Detail level"><option value="executive">Customer view</option><option value="noc">Service view</option><option value="engineering">Network details</option></select></div><div class="detail-content" id="detail-content"></div></article>
+        <article class="panel story-panel"><div class="panel-heading compact"><div><span class="section-kicker">TV WEATHER MODE</span><h2>Forecast stories</h2></div><span class="story-index" id="story-index">1 / 5</span></div><div class="story-list" id="story-list"></div></article>
       </section>
     </main>
-    <footer class="footer"><span>Network Weather Command Center · Network, topology, subscriber and EHS values are sanitized mock data</span><span>Weather and IRIMO are provider-backed and labeled by freshness</span></footer>
+    <footer class="footer"><span>Network Weather · Customer-experience and LDP-style network values are sanitized mock data</span><span>Weather and IRIMO are provider-backed and labeled by freshness</span></footer>
   </div>
   <script src="./data.js?v=20261016-1"></script>
-  <script src="./command-center-data.js?v=20261017-1"></script>
-  <script src="./app.js?v=20261017-10"></script>
-  <script src="./command-center.js?v=20261017-3"></script>
+  <script src="./customer-experience-data.js?v=20261017-1"></script>
+  <script src="./app.js?v=20261017-13"></script>
+  <script src="./customer-experience.js?v=20261017-1"></script>
 </body>
 </html>
