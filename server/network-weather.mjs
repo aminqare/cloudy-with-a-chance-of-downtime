@@ -123,7 +123,7 @@ async function fetchWeatherApi() {
   return results;
 }
 
-export async function fetchWeatherConditions({ force = false } = {}) {
+export async function fetchWeatherConditions({ force = false, includeIrimo = true } = {}) {
   const cacheAge = Date.now() - weatherConditionCache.fetchedAt;
   if (!force && weatherConditionCache.data && cacheAge < 5 * 60 * 1000) return weatherConditionCache.data;
   const providerFns = [["Open-Meteo", fetchOpenMeteo], ["OpenWeatherMap", fetchOpenWeather], ["WeatherAPI.com", fetchWeatherApi]];
@@ -144,7 +144,9 @@ export async function fetchWeatherConditions({ force = false } = {}) {
     return { ...station, temperatureC: temperature.value == null ? null : Number(temperature.value.toFixed(1)), humidity: humidity.value == null ? null : Math.round(humidity.value), weatherCondition: condition.value || primary.weatherCondition || null, windKmh: wind.value == null ? null : Number(wind.value.toFixed(1)), windGustKmh: gust.value == null ? null : Number(gust.value.toFixed(1)), windDirection: direction.value || primary.windDirection || "N", observedAt: primary.observedAt || null, agreement: { temperature, humidity, condition, wind, gust, direction } };
   });
   let irimo = { status: "unavailable", warnings: [] };
-  try { irimo = await fetchIrimoWarnings(); } catch { /* the warning endpoint already returns a safe fallback */ }
+  if (includeIrimo) {
+    try { irimo = await fetchIrimoWarnings(); } catch { /* the warning endpoint already returns a safe fallback */ }
+  }
   const warningVotes = [
     { provider: "IRIMO", state: irimo.warnings?.length ? "warning" : "clear", detail: "official bulletin" },
     ...results.filter((result) => result.provider !== "Open-Meteo").map((result) => { const alertStations = result.stations.filter((station) => station.alertsSupported !== false); const hasAlert = alertStations.some((station) => station.alertsActive); return { provider: result.provider, state: result.state !== "live" ? "unavailable" : alertStations.length ? (hasAlert ? "warning" : "clear") : "unsupported", detail: result.error || (alertStations.length ? "alerts endpoint" : "current conditions only") }; }),
