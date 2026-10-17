@@ -1,11 +1,11 @@
 ---
 id: TASK-4
 title: Turn Network Weather into an operator weather desk
-status: In Progress
+status: Done
 assignee:
   - Codex
 created_date: '2026-10-17 07:21'
-updated_date: '2026-10-17 07:24'
+updated_date: '2026-10-17 07:25'
 labels:
   - network-weather
   - operator-experience
@@ -33,13 +33,13 @@ The customer-facing forecast is clean, but an operator still has to infer priori
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 The first screen shows shift status, freshness, open priority count, and customer impact at a glance.
-- [ ] #2 A prioritized operator queue ranks regions by service impact and provides a clear recommended action, owner, and acknowledgement state.
-- [ ] #3 Selecting a queue row or map marker synchronizes the selected regional detail and focuses the operator on the same area.
-- [ ] #4 Weather, customer experience, RRC-derived demand, and TRP-derived speed remain the only primary operational domains.
-- [ ] #5 Operational controls remain understandable to non-engineers and explicitly label mock network values versus provider-backed weather.
-- [ ] #6 Desktop and mobile views fit without horizontal overflow and all existing verification checks pass.
-- [ ] #7 The updated experience is published to the existing GitHub Pages site.
+- [x] #1 The first screen shows shift status, freshness, open priority count, and customer impact at a glance.
+- [x] #2 A prioritized operator queue ranks regions by service impact and provides a clear recommended action, owner, and acknowledgement state.
+- [x] #3 Selecting a queue row or map marker synchronizes the selected regional detail and focuses the operator on the same area.
+- [x] #4 Weather, customer experience, RRC-derived demand, and TRP-derived speed remain the only primary operational domains.
+- [x] #5 Operational controls remain understandable to non-engineers and explicitly label mock network values versus provider-backed weather.
+- [x] #6 Desktop and mobile views fit without horizontal overflow and all existing verification checks pass.
+- [x] #7 The updated experience is published to the existing GitHub Pages site.
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -62,3 +62,15 @@ Browser QA proved acknowledgement count changes, Shiraz queue/map/detail synchro
 
 Validation passed: JavaScript syntax checks, npm run verify:network-weather-mvp, and git diff --check.
 <!-- SECTION:NOTES:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Upgraded Network Weather into a focused operator weather desk while preserving the weather-plus-LDP product boundary. The first screen now exposes shift health, source freshness, open priority count, potential customer impact, and explicit live-versus-mock provenance. A ranked action queue adds regional impact, owner, response target, recommended action, filters, and persistent local acknowledgement state. Queue selections, customer-experience map markers, and regional detail remain synchronized; the handover card focuses the highest-risk region and provides direct access to network detail.
+
+Kept weather, customer experience, RRC-derived demand, and TRP-derived speed as the only primary domains. Updated responsive styling, README content, and the MVP verification contract.
+
+Verification passed with JavaScript syntax checks, the complete network-weather MVP suite, git diff checks, desktop and 375px mobile browser QA, functional acknowledgement and Shiraz selection synchronization, zero horizontal overflow, and no browser console warnings or errors. The public GitHub Pages build was verified with 5 shift cards, 6 queue rows, 8 map markers, 6 provider-backed stations, and 20 IRIMO snapshot bulletins.
+
+Published from commit 3c6c9af.
+<!-- SECTION:FINAL_SUMMARY:END -->
