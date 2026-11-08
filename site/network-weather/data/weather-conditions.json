@@ -1,6 +1,6 @@
 {
   "status": "live",
-  "fetchedAt": "2026-11-08T08:46:04.811Z",
+  "fetchedAt": "2026-11-08T15:43:21.466Z",
   "source": {
     "provider": "Open-Meteo + WeatherAPI.com",
     "url": "https://open-meteo.com/en/docs"
@@ -28,16 +28,16 @@
       "name": "Tehran",
       "lat": 35.6892,
       "lon": 51.389,
-      "temperatureC": 13.5,
-      "humidity": 83,
-      "weatherCondition": "snow",
-      "windKmh": 2.5,
-      "windGustKmh": 14.4,
-      "windDirection": "N",
-      "observedAt": "2026-11-08T12:15",
+      "temperatureC": 12.4,
+      "humidity": 78,
+      "weatherCondition": "cloud",
+      "windKmh": 4.4,
+      "windGustKmh": 27.4,
+      "windDirection": "NE",
+      "observedAt": "2026-11-08T19:00",
       "agreement": {
         "temperature": {
-          "value": 13.5,
+          "value": 12.4,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -48,7 +48,7 @@
           ]
         },
         "humidity": {
-          "value": 83,
+          "value": 78,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -59,7 +59,7 @@
           ]
         },
         "condition": {
-          "value": "snow",
+          "value": "cloud",
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -70,7 +70,7 @@
           ]
         },
         "wind": {
-          "value": 2.5,
+          "value": 4.4,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -81,7 +81,7 @@
           ]
         },
         "gust": {
-          "value": 14.4,
+          "value": 27.4,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -92,7 +92,7 @@
           ]
         },
         "direction": {
-          "value": "N",
+          "value": "NE",
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -109,97 +109,16 @@
       "name": "Tabriz",
       "lat": 38.0962,
       "lon": 46.2738,
-      "temperatureC": 12.9,
-      "humidity": 59,
-      "weatherCondition": "snow",
-      "windKmh": 13.4,
-      "windGustKmh": 38.9,
-      "windDirection": "W",
-      "observedAt": "2026-11-08T12:15",
-      "agreement": {
-        "temperature": {
-          "value": 12.9,
-          "votes": 1,
-          "total": 2,
-          "supporting": [
-            "Open-Meteo"
-          ],
-          "dissenting": [
-            "WeatherAPI.com"
-          ]
-        },
-        "humidity": {
-          "value": 59,
-          "votes": 1,
-          "total": 2,
-          "supporting": [
-            "Open-Meteo"
-          ],
-          "dissenting": [
-            "WeatherAPI.com"
-          ]
-        },
-        "condition": {
-          "value": "snow",
-          "votes": 1,
-          "total": 2,
-          "supporting": [
-            "Open-Meteo"
-          ],
-          "dissenting": [
-            "WeatherAPI.com"
-          ]
-        },
-        "wind": {
-          "value": 13.4,
-          "votes": 1,
-          "total": 2,
-          "supporting": [
-            "Open-Meteo"
-          ],
-          "dissenting": [
-            "WeatherAPI.com"
-          ]
-        },
-        "gust": {
-          "value": 38.9,
-          "votes": 1,
-          "total": 2,
-          "supporting": [
-            "Open-Meteo"
-          ],
-          "dissenting": [
-            "WeatherAPI.com"
-          ]
-        },
-        "direction": {
-          "value": "W",
-          "votes": 1,
-          "total": 2,
-          "supporting": [
-            "Open-Meteo"
-          ],
-          "dissenting": [
-            "WeatherAPI.com"
-          ]
-        }
-      }
-    },
-    {
-      "id": "mashhad",
-      "name": "Mashhad",
-      "lat": 36.2605,
-      "lon": 59.6168,
-      "temperatureC": 26.4,
-      "humidity": 21,
+      "temperatureC": 8.8,
+      "humidity": 58,
       "weatherCondition": "cloud",
-      "windKmh": 24.9,
-      "windGustKmh": 48.2,
+      "windKmh": 19.1,
+      "windGustKmh": 35.3,
       "windDirection": "SW",
-      "observedAt": "2026-11-08T12:15",
+      "observedAt": "2026-11-08T19:00",
       "agreement": {
         "temperature": {
-          "value": 26.4,
+          "value": 8.8,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -210,27 +129,29 @@
           ]
         },
         "humidity": {
-          "value": 20.5,
-          "votes": 2,
+          "value": 58,
+          "votes": 1,
           "total": 2,
           "supporting": [
-            "Open-Meteo",
-            "WeatherAPI.com"
+            "Open-Meteo"
           ],
-          "dissenting": []
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
         },
         "condition": {
           "value": "cloud",
-          "votes": 2,
+          "votes": 1,
           "total": 2,
           "supporting": [
-            "Open-Meteo",
-            "WeatherAPI.com"
+            "Open-Meteo"
           ],
-          "dissenting": []
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
         },
         "wind": {
-          "value": 24.9,
+          "value": 19.1,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -241,7 +162,7 @@
           ]
         },
         "gust": {
-          "value": 48.2,
+          "value": 35.3,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -264,20 +185,20 @@
       }
     },
     {
-      "id": "isfahan",
-      "name": "Isfahan",
-      "lat": 32.6546,
-      "lon": 51.668,
-      "temperatureC": 16.2,
-      "humidity": 61,
+      "id": "mashhad",
+      "name": "Mashhad",
+      "lat": 36.2605,
+      "lon": 59.6168,
+      "temperatureC": 19.9,
+      "humidity": 35,
       "weatherCondition": "cloud",
-      "windKmh": 7.1,
-      "windGustKmh": 20.9,
-      "windDirection": "SE",
-      "observedAt": "2026-11-08T12:15",
+      "windKmh": 6.1,
+      "windGustKmh": 11.9,
+      "windDirection": "SW",
+      "observedAt": "2026-11-08T19:00",
       "agreement": {
         "temperature": {
-          "value": 16.2,
+          "value": 19.95,
           "votes": 2,
           "total": 2,
           "supporting": [
@@ -287,7 +208,7 @@
           "dissenting": []
         },
         "humidity": {
-          "value": 61,
+          "value": 35,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -299,17 +220,16 @@
         },
         "condition": {
           "value": "cloud",
-          "votes": 1,
+          "votes": 2,
           "total": 2,
           "supporting": [
-            "Open-Meteo"
-          ],
-          "dissenting": [
+            "Open-Meteo",
             "WeatherAPI.com"
-          ]
+          ],
+          "dissenting": []
         },
         "wind": {
-          "value": 7.1,
+          "value": 6.1,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -320,7 +240,168 @@
           ]
         },
         "gust": {
-          "value": 20.9,
+          "value": 11.9,
+          "votes": 1,
+          "total": 2,
+          "supporting": [
+            "Open-Meteo"
+          ],
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
+        },
+        "direction": {
+          "value": "SW",
+          "votes": 1,
+          "total": 2,
+          "supporting": [
+            "Open-Meteo"
+          ],
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
+        }
+      }
+    },
+    {
+      "id": "isfahan",
+      "name": "Isfahan",
+      "lat": 32.6546,
+      "lon": 51.668,
+      "temperatureC": 13.8,
+      "humidity": 53,
+      "weatherCondition": "clear",
+      "windKmh": 7.4,
+      "windGustKmh": 17.6,
+      "windDirection": "SW",
+      "observedAt": "2026-11-08T19:00",
+      "agreement": {
+        "temperature": {
+          "value": 13.8,
+          "votes": 1,
+          "total": 2,
+          "supporting": [
+            "Open-Meteo"
+          ],
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
+        },
+        "humidity": {
+          "value": 53,
+          "votes": 1,
+          "total": 2,
+          "supporting": [
+            "Open-Meteo"
+          ],
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
+        },
+        "condition": {
+          "value": "clear",
+          "votes": 2,
+          "total": 2,
+          "supporting": [
+            "Open-Meteo",
+            "WeatherAPI.com"
+          ],
+          "dissenting": []
+        },
+        "wind": {
+          "value": 7.4,
+          "votes": 1,
+          "total": 2,
+          "supporting": [
+            "Open-Meteo"
+          ],
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
+        },
+        "gust": {
+          "value": 17.6,
+          "votes": 1,
+          "total": 2,
+          "supporting": [
+            "Open-Meteo"
+          ],
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
+        },
+        "direction": {
+          "value": "SW",
+          "votes": 1,
+          "total": 2,
+          "supporting": [
+            "Open-Meteo"
+          ],
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
+        }
+      }
+    },
+    {
+      "id": "shiraz",
+      "name": "Shiraz",
+      "lat": 29.5918,
+      "lon": 52.5837,
+      "temperatureC": 14.9,
+      "humidity": 89,
+      "weatherCondition": "storm",
+      "windKmh": 5.2,
+      "windGustKmh": 24.8,
+      "windDirection": "SE",
+      "observedAt": "2026-11-08T19:00",
+      "agreement": {
+        "temperature": {
+          "value": 14.9,
+          "votes": 1,
+          "total": 2,
+          "supporting": [
+            "Open-Meteo"
+          ],
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
+        },
+        "humidity": {
+          "value": 89,
+          "votes": 1,
+          "total": 2,
+          "supporting": [
+            "Open-Meteo"
+          ],
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
+        },
+        "condition": {
+          "value": "storm",
+          "votes": 1,
+          "total": 2,
+          "supporting": [
+            "Open-Meteo"
+          ],
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
+        },
+        "wind": {
+          "value": 5.2,
+          "votes": 1,
+          "total": 2,
+          "supporting": [
+            "Open-Meteo"
+          ],
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
+        },
+        "gust": {
+          "value": 24.8,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -344,109 +425,31 @@
       }
     },
     {
-      "id": "shiraz",
-      "name": "Shiraz",
-      "lat": 29.5918,
-      "lon": 52.5837,
-      "temperatureC": 16.8,
-      "humidity": 69,
-      "weatherCondition": "rain",
-      "windKmh": 10.7,
-      "windGustKmh": 43.6,
-      "windDirection": "NW",
-      "observedAt": "2026-11-08T12:15",
-      "agreement": {
-        "temperature": {
-          "value": 16.8,
-          "votes": 1,
-          "total": 2,
-          "supporting": [
-            "Open-Meteo"
-          ],
-          "dissenting": [
-            "WeatherAPI.com"
-          ]
-        },
-        "humidity": {
-          "value": 69,
-          "votes": 2,
-          "total": 2,
-          "supporting": [
-            "Open-Meteo",
-            "WeatherAPI.com"
-          ],
-          "dissenting": []
-        },
-        "condition": {
-          "value": "rain",
-          "votes": 2,
-          "total": 2,
-          "supporting": [
-            "Open-Meteo",
-            "WeatherAPI.com"
-          ],
-          "dissenting": []
-        },
-        "wind": {
-          "value": 10.7,
-          "votes": 1,
-          "total": 2,
-          "supporting": [
-            "Open-Meteo"
-          ],
-          "dissenting": [
-            "WeatherAPI.com"
-          ]
-        },
-        "gust": {
-          "value": 43.6,
-          "votes": 1,
-          "total": 2,
-          "supporting": [
-            "Open-Meteo"
-          ],
-          "dissenting": [
-            "WeatherAPI.com"
-          ]
-        },
-        "direction": {
-          "value": "NW",
-          "votes": 1,
-          "total": 2,
-          "supporting": [
-            "Open-Meteo"
-          ],
-          "dissenting": [
-            "WeatherAPI.com"
-          ]
-        }
-      }
-    },
-    {
       "id": "bandar-abbas",
       "name": "Bandar Abbas",
       "lat": 27.1832,
       "lon": 56.2666,
-      "temperatureC": 29.9,
-      "humidity": 63,
+      "temperatureC": 28.9,
+      "humidity": 68,
       "weatherCondition": "cloud",
-      "windKmh": 9.2,
-      "windGustKmh": 18,
-      "windDirection": "S",
-      "observedAt": "2026-11-08T12:15",
+      "windKmh": 6.6,
+      "windGustKmh": 12.2,
+      "windDirection": "SW",
+      "observedAt": "2026-11-08T19:00",
       "agreement": {
         "temperature": {
-          "value": 29.9,
-          "votes": 2,
+          "value": 28.9,
+          "votes": 1,
           "total": 2,
           "supporting": [
-            "Open-Meteo",
-            "WeatherAPI.com"
+            "Open-Meteo"
           ],
-          "dissenting": []
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
         },
         "humidity": {
-          "value": 63,
+          "value": 68,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -458,16 +461,17 @@
         },
         "condition": {
           "value": "cloud",
-          "votes": 2,
+          "votes": 1,
           "total": 2,
           "supporting": [
-            "Open-Meteo",
-            "WeatherAPI.com"
+            "Open-Meteo"
           ],
-          "dissenting": []
+          "dissenting": [
+            "WeatherAPI.com"
+          ]
         },
         "wind": {
-          "value": 9.2,
+          "value": 6.6,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -478,7 +482,7 @@
           ]
         },
         "gust": {
-          "value": 18,
+          "value": 12.2,
           "votes": 1,
           "total": 2,
           "supporting": [
@@ -489,7 +493,7 @@
           ]
         },
         "direction": {
-          "value": "S",
+          "value": "SW",
           "votes": 2,
           "total": 2,
           "supporting": [
